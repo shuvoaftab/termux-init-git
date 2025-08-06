@@ -89,21 +89,46 @@ download_repo() {
     
     if [ -d "$INSTALL_DIR" ]; then
         warning "Directory $INSTALL_DIR already exists"
-        read -p "Do you want to update it? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            info "Updating existing installation..."
-            cd "$INSTALL_DIR"
-            if git pull origin main; then
-                success "Repository updated successfully"
-            else
-                error "Failed to update repository"
-                info "You may need to remove $INSTALL_DIR and run the installer again"
-                exit 1
-            fi
-        else
-            info "Using existing installation"
-        fi
+        echo ""
+        echo "Choose an option:"
+        echo "1) Remove and download fresh copy (recommended)"
+        echo "2) Update existing installation (git pull)"
+        echo "3) Keep existing and continue"
+        echo ""
+        read -p "Enter your choice (1/2/3): " -n 1 -r
+        echo ""
+        
+        case $REPLY in
+            1)
+                warning "Removing existing directory..."
+                rm -rf "$INSTALL_DIR"
+                info "Downloading fresh copy from $REPO_URL..."
+                if git clone "$REPO_URL" "$INSTALL_DIR"; then
+                    success "Fresh repository downloaded to $INSTALL_DIR"
+                else
+                    error "Failed to clone repository"
+                    info "Please check your internet connection and try again"
+                    exit 1
+                fi
+                ;;
+            2)
+                info "Updating existing installation..."
+                cd "$INSTALL_DIR"
+                if git pull origin main; then
+                    success "Repository updated successfully"
+                else
+                    error "Failed to update repository"
+                    info "You may need to remove $INSTALL_DIR and run the installer again"
+                    exit 1
+                fi
+                ;;
+            3)
+                info "Using existing installation"
+                ;;
+            *)
+                warning "Invalid choice. Using existing installation"
+                ;;
+        esac
     else
         info "Cloning repository from $REPO_URL..."
         if git clone "$REPO_URL" "$INSTALL_DIR"; then
@@ -148,23 +173,37 @@ setup_permissions() {
 show_instructions() {
     success "Installation completed successfully!"
     echo ""
-    info "📋 Next Steps:"
-    echo "1. cd $INSTALL_DIR"
-    echo "2. ./init-keys.sh"
-    echo "3. Add the deploy key to your GitHub repository"
-    echo "4. Edit git-clone.sh with your repository URL"
-    echo "5. ./git-clone.sh"
+    
+    # Navigate to the installation directory
+    if cd "$INSTALL_DIR" 2>/dev/null; then
+        success "Navigated to $INSTALL_DIR"
+        info "Current directory: $(pwd)"
+    else
+        warning "Could not navigate to $INSTALL_DIR"
+    fi
+    
     echo ""
-    info "📚 Documentation:"
+    info "📋 Next Steps:"
+    echo "1. Run: ./init-keys.sh"
+    echo "2. Add the deploy key to your GitHub repository (Settings > Deploy Keys)"
+    echo "3. Edit git-clone.sh with your repository URL"
+    echo "4. Run: ./git-clone.sh"
+    echo ""
+    info "📚 Available Documentation:"
     echo "- README.md - Complete setup guide"
-    echo "- FAQ.md - Frequently asked questions"
+    echo "- FAQ.md - Frequently asked questions"  
+    echo "- CONTRIBUTING.md - Contribution guidelines"
     echo "- examples/ - Advanced usage examples"
     echo ""
-    info "🔧 Troubleshooting:"
-    echo "- ./examples/troubleshooting.sh - Diagnostic tool"
+    info "🔧 Quick Commands:"
+    echo "- View README: cat README.md"
+    echo "- Start setup: ./init-keys.sh"
+    echo "- Get help: ./init-keys.sh --help"
+    echo "- Troubleshoot: ./examples/troubleshooting.sh"
     echo "- View logs: cat $LOG_FILE"
     echo ""
-    warning "Remember to review the scripts before running them!"
+    warning "📖 Please review the scripts before running them!"
+    info "🚀 Ready to start? Run: ./init-keys.sh"
 }
 
 # Main installation process
@@ -202,6 +241,13 @@ main() {
     show_instructions
     
     log "Installation completed: $(date)"
+    
+    # Final message with current location
+    echo ""
+    if [ -d "$INSTALL_DIR" ]; then
+        success "🎉 Installation complete! You are now in the project directory."
+        info "💡 Tip: Start with './init-keys.sh' to begin setup"
+    fi
 }
 
 # Show help
@@ -251,9 +297,25 @@ case "${1:-}" in
         ;;
     --update)
         info "Updating installation..."
-        download_repo
-        setup_permissions
-        success "Update completed"
+        if [ -d "$INSTALL_DIR" ]; then
+            cd "$INSTALL_DIR"
+            if git pull origin main; then
+                success "Repository updated successfully"
+                setup_permissions
+                success "Update completed"
+                info "Current directory: $(pwd)"
+                info "Run './init-keys.sh' to start setup"
+            else
+                error "Failed to update repository"
+                info "Try removing and reinstalling: rm -rf $INSTALL_DIR"
+                exit 1
+            fi
+        else
+            warning "Installation directory not found. Downloading fresh copy..."
+            download_repo
+            setup_permissions
+            success "Fresh installation completed"
+        fi
         exit 0
         ;;
     --uninstall)
