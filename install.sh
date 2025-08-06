@@ -3,7 +3,8 @@
 # Termux Git Init - Quick Installer
 # This script downloads and sets up termux-init-git
 
-set -e
+# Don't exit on first error - we want to handle errors gracefully
+set -u  # Exit on undefined variables instead
 
 REPO_URL="https://github.com/shuvoaftab/termux-init-git"
 INSTALL_DIR="$HOME/termux-init-git"
@@ -51,9 +52,25 @@ check_dependencies() {
     done
     
     if [ ${#missing_deps[@]} -gt 0 ]; then
-        error "Missing dependencies: ${missing_deps[*]}"
+        warning "Missing dependencies: ${missing_deps[*]}"
         info "Installing missing packages..."
-        pkg update && pkg install "${missing_deps[@]}"
+        
+        # Update package list
+        if ! pkg update -y; then
+            warning "Package update failed, continuing anyway..."
+        fi
+        
+        # Install missing packages with auto-confirmation
+        for dep in "${missing_deps[@]}"; do
+            info "Installing $dep..."
+            if pkg install -y "$dep"; then
+                success "$dep installed successfully"
+            else
+                error "Failed to install $dep"
+                info "Please install manually: pkg install $dep"
+                exit 1
+            fi
+        done
     fi
     
     success "All dependencies are available"
@@ -70,13 +87,25 @@ download_repo() {
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             info "Updating existing installation..."
             cd "$INSTALL_DIR"
-            git pull origin main
+            if git pull origin main; then
+                success "Repository updated successfully"
+            else
+                error "Failed to update repository"
+                info "You may need to remove $INSTALL_DIR and run the installer again"
+                exit 1
+            fi
         else
             info "Using existing installation"
         fi
     else
-        git clone "$REPO_URL" "$INSTALL_DIR"
-        success "Repository downloaded to $INSTALL_DIR"
+        info "Cloning repository from $REPO_URL..."
+        if git clone "$REPO_URL" "$INSTALL_DIR"; then
+            success "Repository downloaded to $INSTALL_DIR"
+        else
+            error "Failed to clone repository"
+            info "Please check your internet connection and try again"
+            exit 1
+        fi
     fi
 }
 
@@ -84,11 +113,25 @@ download_repo() {
 setup_permissions() {
     info "Setting up file permissions..."
     
-    cd "$INSTALL_DIR"
-    chmod +x init-keys.sh git-clone.sh
+    if ! cd "$INSTALL_DIR"; then
+        error "Failed to enter directory $INSTALL_DIR"
+        exit 1
+    fi
     
+    # Make main scripts executable
+    for script in init-keys.sh git-clone.sh; do
+        if [ -f "$script" ]; then
+            chmod +x "$script"
+            info "Made $script executable"
+        else
+            warning "$script not found - may need manual setup"
+        fi
+    done
+    
+    # Make example scripts executable
     if [ -d examples ]; then
-        find examples -name "*.sh" -exec chmod +x {} \;
+        find examples -name "*.sh" -exec chmod +x {} \; 2>/dev/null || true
+        info "Made example scripts executable"
     fi
     
     success "Permissions set correctly"
@@ -124,7 +167,27 @@ main() {
     echo "Installing secure Git setup for Termux..."
     echo ""
     
+    # Create log file directory if needed
+    local log_dir=$(dirname "$LOG_FILE")
+    if [ ! -d "$log_dir" ]; then
+        mkdir -p "$log_dir" 2>/dev/null || true
+    fi
+    
+    # Initialize log file
+    if ! touch "$LOG_FILE" 2>/dev/null; then
+        warning "Cannot create log file at $LOG_FILE"
+        LOG_FILE="/tmp/termux-init-git-install.log"
+        info "Using temporary log file: $LOG_FILE"
+    fi
+    
     log "Installation started: $(date)"
+    log "HOME directory: $HOME"
+    log "Install directory: $INSTALL_DIR"
+    log "Log file: $LOG_FILE"
+    
+    info "Checking environment..."
+    info "Current shell: $0"
+    info "Working directory: $(pwd)"
     
     check_dependencies
     download_repo
