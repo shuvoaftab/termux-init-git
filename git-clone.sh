@@ -18,16 +18,16 @@ retry_ssh_check() {
     local attempt=1
     log "🔍 Testing SSH connection to GitHub via port 443..."
     
-    # Use the default SSH key
-    until ssh -T -p 443 -i ~/.ssh/id_rsa git@ssh.github.com 2>&1 | tee -a "$LOG" | grep -E "(successfully authenticated|You've successfully authenticated)" > /dev/null; do
+    # Use SSH config settings (no need to specify key file)
+    until ssh -T -p 443 git@ssh.github.com 2>&1 | tee -a "$LOG" | grep -E "(successfully authenticated|You've successfully authenticated)" > /dev/null; do
         if (( attempt >= RETRIES )); then
             log "❌ Failed to authenticate with GitHub after $RETRIES attempts."
             log "💡 Make sure your SSH key is added as a deploy key to the repository."
-            log "💡 You can test manually with: ssh -T -p 443 -i ~/.ssh/id_rsa git@ssh.github.com"
+            log "💡 You can test manually with: ssh -T -p 443 git@ssh.github.com"
             
             # Show last SSH attempt for debugging
             log "🔍 Last SSH attempt output:"
-            ssh -T -p 443 -i ~/.ssh/id_rsa git@ssh.github.com 2>&1 | tail -5 | tee -a "$LOG"
+            ssh -T -p 443 git@ssh.github.com 2>&1 | tail -5 | tee -a "$LOG"
             exit 1
         fi
         log "⏳ GitHub auth not ready. Retrying ($attempt/$RETRIES)..."
@@ -43,13 +43,21 @@ log "🔐 Verifying GitHub SSH access..."
 if [ -z "$SSH_AUTH_SOCK" ]; then
     log "🚀 Starting SSH agent..."
     eval "$(ssh-agent -s)" | tee -a "$LOG"
+    
+    # Export the SSH_AUTH_SOCK for current shell
+    export SSH_AUTH_SOCK
+    export SSH_AGENT_PID
 fi
 
-# Add any SSH keys in ~/.ssh to the agent
+# Add any SSH keys in ~/.ssh to the agent (with better error handling)
 for key in ~/.ssh/id_*; do
     if [ -f "$key" ] && [ ! "${key##*.}" = "pub" ]; then
         log "🔑 Adding key to SSH agent: $key"
-        ssh-add "$key" 2>&1 | tee -a "$LOG"
+        if [ -n "$SSH_AUTH_SOCK" ] && [ -S "$SSH_AUTH_SOCK" ]; then
+            ssh-add "$key" 2>&1 | tee -a "$LOG"
+        else
+            log "⚠️ SSH agent not available, skipping key addition"
+        fi
     fi
 done
 
@@ -59,18 +67,25 @@ if [ -d "$DEST/.git" ]; then
     log "⚠️ Repo already exists at $DEST/.git, skipping clone."
 else
     log "📦 Cloning repo contents to $DEST (with trace logging)..."
-    # Create a temporary directory for cloning
-    TEMP_CLONE="/tmp/termux-namp-$$"
-    GIT_TRACE=1 GIT_SSH_COMMAND="ssh -v -p 443 -i ~/.ssh/id_rsa" git clone "$REPO_SSH" "$TEMP_CLONE" 2>&1 | tee -a "$LOG"
+    # Create a temporary directory for cloning in a writable location
+    TEMP_CLONE="$HOME/temp-clone-$$"
+    
+    # Clean up any existing temp directory
+    rm -rf "$TEMP_CLONE"
+    
+    GIT_TRACE=1 GIT_SSH_COMMAND="ssh -v -p 443" git clone "$REPO_SSH" "$TEMP_CLONE" 2>&1 | tee -a "$LOG"
 
-    if [ $? -eq 0 ]; then
+    if [ $? -eq 0 ] && [ -d "$TEMP_CLONE" ]; then
         log "📁 Moving repository contents to $DEST..."
         # Move all contents including .git to HOME
-        mv "$TEMP_CLONE"/* "$TEMP_CLONE"/.[^.]* "$DEST/" 2>/dev/null
-        rmdir "$TEMP_CLONE"
+        cd "$TEMP_CLONE"
+        mv .* * "$DEST/" 2>/dev/null
+        cd "$HOME"
+        rmdir "$TEMP_CLONE" 2>/dev/null
         log "✅ Repository cloned successfully to $DEST"
     else
-        log "❌ Clone failed"
+        log "❌ Clone failed - check network connection and SSH key setup"
+        log "💡 Verify your deploy key is added to: https://github.com/android-research/termux-namp/settings/keys"
         rm -rf "$TEMP_CLONE"
         exit 1
     fi
