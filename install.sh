@@ -95,13 +95,25 @@ download_repo() {
         echo "2) Update existing installation (git pull)"
         echo "3) Keep existing and continue"
         echo ""
-        read -p "Enter your choice (1/2/3): " -n 1 -r
+        
+        # Handle piped input by reading from terminal directly
+        if [ -t 0 ]; then
+            read -p "Enter your choice (1/2/3): " -n 1 -r
+        else
+            # When piped (like from curl), read from terminal
+            read -p "Enter your choice (1/2/3): " -n 1 -r < /dev/tty
+        fi
         echo ""
         
         case $REPLY in
             1)
                 warning "Removing existing directory..."
-                rm -rf "$INSTALL_DIR"
+                if rm -rf "$INSTALL_DIR"; then
+                    success "Existing directory removed"
+                else
+                    error "Failed to remove existing directory"
+                    exit 1
+                fi
                 info "Downloading fresh copy from $REPO_URL..."
                 if git clone "$REPO_URL" "$INSTALL_DIR"; then
                     success "Fresh repository downloaded to $INSTALL_DIR"
@@ -113,12 +125,16 @@ download_repo() {
                 ;;
             2)
                 info "Updating existing installation..."
-                cd "$INSTALL_DIR"
-                if git pull origin main; then
-                    success "Repository updated successfully"
+                if cd "$INSTALL_DIR"; then
+                    if git pull origin main; then
+                        success "Repository updated successfully"
+                    else
+                        error "Failed to update repository"
+                        info "You may need to remove $INSTALL_DIR and run the installer again"
+                        exit 1
+                    fi
                 else
-                    error "Failed to update repository"
-                    info "You may need to remove $INSTALL_DIR and run the installer again"
+                    error "Could not enter directory $INSTALL_DIR"
                     exit 1
                 fi
                 ;;
@@ -174,20 +190,12 @@ show_instructions() {
     success "Installation completed successfully!"
     echo ""
     
-    # Navigate to the installation directory
-    if cd "$INSTALL_DIR" 2>/dev/null; then
-        success "Navigated to $INSTALL_DIR"
-        info "Current directory: $(pwd)"
-    else
-        warning "Could not navigate to $INSTALL_DIR"
-    fi
-    
-    echo ""
     info "📋 Next Steps:"
-    echo "1. Run: ./init-keys.sh"
-    echo "2. Add the deploy key to your GitHub repository (Settings > Deploy Keys)"
-    echo "3. Edit git-clone.sh with your repository URL"
-    echo "4. Run: ./git-clone.sh"
+    echo "1. cd $INSTALL_DIR"
+    echo "2. ./init-keys.sh"
+    echo "3. Add the deploy key to your GitHub repository (Settings > Deploy Keys)"
+    echo "4. Edit git-clone.sh with your repository URL"
+    echo "5. ./git-clone.sh"
     echo ""
     info "📚 Available Documentation:"
     echo "- README.md - Complete setup guide"
@@ -195,7 +203,7 @@ show_instructions() {
     echo "- CONTRIBUTING.md - Contribution guidelines"
     echo "- examples/ - Advanced usage examples"
     echo ""
-    info "🔧 Quick Commands:"
+    info "🔧 Quick Commands (after cd $INSTALL_DIR):"
     echo "- View README: cat README.md"
     echo "- Start setup: ./init-keys.sh"
     echo "- Get help: ./init-keys.sh --help"
@@ -203,7 +211,9 @@ show_instructions() {
     echo "- View logs: cat $LOG_FILE"
     echo ""
     warning "📖 Please review the scripts before running them!"
-    info "🚀 Ready to start? Run: ./init-keys.sh"
+    echo ""
+    success "🚀 Quick start:"
+    info "cd $INSTALL_DIR && ./init-keys.sh"
 }
 
 # Main installation process
@@ -242,11 +252,22 @@ main() {
     
     log "Installation completed: $(date)"
     
-    # Final message with current location
-    echo ""
+    # Create a quick setup script
     if [ -d "$INSTALL_DIR" ]; then
-        success "🎉 Installation complete! You are now in the project directory."
-        info "💡 Tip: Start with './init-keys.sh' to begin setup"
+        echo ""
+        success "🎉 Installation complete!"
+        
+        # Create a convenience script
+        cat > "$HOME/termux-git-setup.sh" << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+cd "$HOME/termux-init-git" && exec bash
+EOF
+        chmod +x "$HOME/termux-git-setup.sh"
+        
+        echo ""
+        info "💡 Two ways to start:"
+        echo "1. cd $INSTALL_DIR && ./init-keys.sh"
+        echo "2. ~/termux-git-setup.sh (then run ./init-keys.sh)"
     fi
 }
 
