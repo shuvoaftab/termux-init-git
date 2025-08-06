@@ -72,7 +72,7 @@ chmod +x init-keys.sh
 
 #### Step 2: Add Deploy Key to GitHub
 
-1. The script exports your public key to `~/storage/shared/id_rsa_git.pub`
+1. The script exports your public key to `~/storage/shared/id_rsa.pub`
 2. Copy this key content
 3. Go to your **repo** → **Settings** → **Deploy keys**
 4. Click **"Add deploy key"**
@@ -101,7 +101,7 @@ chmod +x init-keys.sh
 2. **Generates RSA 4096-bit key pair**
 
    ```bash
-   ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_git -N ""
+   ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
    ```
 
 3. **Sets up storage access**
@@ -118,7 +118,7 @@ chmod +x init-keys.sh
      Hostname ssh.github.com
      Port 443
      User git
-     IdentityFile ~/.ssh/id_rsa_git
+     IdentityFile ~/.ssh/id_rsa
    ```
 
 5. **Downloads the clone script** for the next step
@@ -145,8 +145,8 @@ RETRIES=5                                            # SSH retry attempts
 
 ### Security Considerations
 
-- **Never share your private key** (`~/.ssh/id_rsa_git`)
-- **Only the public key** (`~/.ssh/id_rsa_git.pub`) should be added to GitHub
+- **Never share your private key** (`~/.ssh/id_rsa`)
+- **Only the public key** (`~/.ssh/id_rsa.pub`) should be added to GitHub
 - **Deploy keys are repo-specific** - they can't access other repositories
 - **Review the scripts** before running them on your system
 
@@ -207,7 +207,7 @@ ssh -vT git@github.com
 ssh-add -l
 
 # Test with specific key
-ssh -i ~/.ssh/id_rsa_git -T git@github.com
+ssh -i ~/.ssh/id_rsa -T git@github.com
 ```
 
 ## 📊 Logging and Troubleshooting
@@ -223,7 +223,7 @@ ssh -i ~/.ssh/id_rsa_git -T git@github.com
 
 - Verify the public key is added to GitHub Deploy keys
 - Check SSH config syntax in `~/.ssh/config`
-- Ensure private key permissions: `chmod 600 ~/.ssh/id_rsa_git`
+- Ensure private key permissions: `chmod 600 ~/.ssh/id_rsa`
 
 **"Repository not found"**
 

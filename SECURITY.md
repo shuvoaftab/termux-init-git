@@ -38,7 +38,7 @@ We take security seriously. If you discover a security vulnerability, please fol
 
 ### SSH Key Security
 
-- **Private keys** (`~/.ssh/id_rsa_git`) should never be shared
+- **Private keys** (`~/.ssh/id_rsa`) should never be shared
 - **Public keys** are safe to share but should only be added to intended repositories
 - **Key rotation** should be performed regularly for high-security environments
 
@@ -101,7 +101,7 @@ Host github.com
   Hostname ssh.github.com
   Port 443
   User git
-  IdentityFile ~/.ssh/id_rsa_git
+  IdentityFile ~/.ssh/id_rsa
   IdentitiesOnly yes
   StrictHostKeyChecking yes
   UserKnownHostsFile ~/.ssh/known_hosts
@@ -112,8 +112,8 @@ Host github.com
 ```bash
 # Ensure proper permissions
 chmod 700 ~/.ssh
-chmod 600 ~/.ssh/id_rsa_git
-chmod 644 ~/.ssh/id_rsa_git.pub
+chmod 600 ~/.ssh/id_rsa
+chmod 644 ~/.ssh/id_rsa.pub
 chmod 644 ~/.ssh/config
 chmod 644 ~/.ssh/known_hosts
 ```

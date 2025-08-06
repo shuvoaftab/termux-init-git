@@ -36,7 +36,7 @@ ssh -T git@github.com
 ssh -vT git@github.com
 
 # Test specific key
-ssh -i ~/.ssh/id_rsa_git -T git@github.com
+ssh -i ~/.ssh/id_rsa -T git@github.com
 ```
 
 ---

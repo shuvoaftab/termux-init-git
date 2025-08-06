@@ -35,7 +35,7 @@ Yes, but you'll need to:
 See the [Advanced Configuration](README.md#advanced-configuration) section for details.
 
 ### What if I already have SSH keys?
-The script will detect existing keys and skip generation. It will only create new keys if `~/.ssh/id_rsa_git` doesn't exist.
+The script will detect existing keys and skip generation. It will only create new keys if `~/.ssh/id_rsa` doesn't exist.
 
 ## Troubleshooting
 
@@ -168,10 +168,10 @@ The scripts are GitHub-specific but can be adapted:
 ### How do I backup my SSH keys?
 ```bash
 # Copy keys to safe location
-cp ~/.ssh/id_rsa_git* /path/to/backup/
+cp ~/.ssh/id_rsa* /path/to/backup/
 
 # Or export to Android storage
-cp ~/.ssh/id_rsa_git* ~/storage/shared/
+cp ~/.ssh/id_rsa* ~/storage/shared/
 ```
 
 **⚠️ Warning**: Keep private keys secure and encrypted during backup!

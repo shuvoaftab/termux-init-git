@@ -39,11 +39,11 @@ check_permissions() {
             echo "   Fix with: chmod 700 ~/.ssh"
         fi
         
-        if [ -f ~/.ssh/id_rsa_git ]; then
-            key_perms=$(stat -c "%a" ~/.ssh/id_rsa_git 2>/dev/null || stat -f "%A" ~/.ssh/id_rsa_git 2>/dev/null)
+        if [ -f ~/.ssh/id_rsa ]; then
+            key_perms=$(stat -c "%a" ~/.ssh/id_rsa 2>/dev/null || stat -f "%A" ~/.ssh/id_rsa 2>/dev/null)
             if [ "$key_perms" != "600" ]; then
                 echo "⚠️  Private key permissions should be 600, found: $key_perms"
-                echo "   Fix with: chmod 600 ~/.ssh/id_rsa_git"
+                echo "   Fix with: chmod 600 ~/.ssh/id_rsa"
             fi
         fi
     else
@@ -158,19 +158,19 @@ show_solutions() {
     echo ""
     echo "1. Fix SSH permissions:"
     echo "   chmod 700 ~/.ssh"
-    echo "   chmod 600 ~/.ssh/id_rsa_git"
-    echo "   chmod 644 ~/.ssh/id_rsa_git.pub"
+    echo "   chmod 600 ~/.ssh/id_rsa"
+    echo "   chmod 644 ~/.ssh/id_rsa.pub"
     echo "   chmod 644 ~/.ssh/config"
     
     echo ""
     echo "2. Re-generate SSH key:"
-    echo "   rm -f ~/.ssh/id_rsa_git*"
-    echo "   ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_git -N ''"
+    echo "   rm -f ~/.ssh/id_rsa*"
+    echo "   ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ''"
     
     echo ""
     echo "3. Test SSH connection manually:"
     echo "   ssh -vT git@github.com"
-    echo "   ssh -i ~/.ssh/id_rsa_git -T git@github.com"
+    echo "   ssh -i ~/.ssh/id_rsa -T git@github.com"
     
     echo ""
     echo "4. Reset SSH configuration:"

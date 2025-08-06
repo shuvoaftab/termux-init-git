@@ -11,8 +11,8 @@ echo "1. Add the public key to GitHub (Settings > Deploy Keys) for your private 
 echo "2. Run: ./git-clone.sh"
 echo ""
 warning "Public key locations in storage:"
-info "- Timestamped: ~/storage/shared/id_rsa_git_$(date '+%Y-%m-%d_%H%M').pub"
-info "- Latest: ~/storage/shared/id_rsa_git.pub" Colored output functions
+info "- Timestamped: ~/storage/shared/id_rsa_$(date '+%Y-%m-%d_%H%M').pub"
+info "- Latest: ~/storage/shared/id_rsa.pub" Colored output functions
 info() {
     echo -e "${BLUE}ℹ️  $1${NC}"
 }
@@ -64,7 +64,7 @@ chmod 700 ~/.ssh
 check_dependencies
 
 # Generate key if missing
-KEY=~/.ssh/id_rsa_git
+KEY=~/.ssh/id_rsa
 if [ ! -f "$KEY" ]; then
     info "Generating SSH key..."
     ssh-keygen -t rsa -b 4096 -f "$KEY" -N ""
@@ -106,14 +106,14 @@ fi
 if [ -d ~/storage/shared ]; then
     # Generate timestamp in Y-m-d_HHMM format (no colons for filename compatibility)
     TIMESTAMP=$(date '+%Y-%m-%d_%H%M')
-    EXPORT_FILENAME="id_rsa_git_${TIMESTAMP}.pub"
+    EXPORT_FILENAME="id_rsa_${TIMESTAMP}.pub"
     
     cp "$KEY.pub" ~/storage/shared/"$EXPORT_FILENAME"
     success "Public key exported to Android storage as: $EXPORT_FILENAME"
     
     # Also create a copy without timestamp for convenience
-    cp "$KEY.pub" ~/storage/shared/id_rsa_git.pub
-    info "Also saved as: id_rsa_git.pub (latest)"
+    cp "$KEY.pub" ~/storage/shared/id_rsa.pub
+    info "Also saved as: id_rsa.pub (latest)"
 else
     warning "Could not access shared storage. Please run 'termux-setup-storage' manually."
 fi
@@ -166,4 +166,4 @@ info "📋 Next Steps:"
 echo "1. Add the public key to GitHub (Settings > Deploy Keys) for your private repo"
 echo "2. Run: ./git-clone.sh"
 echo ""
-warning "Public key location in storage: ~/storage/shared/id_rsa_git_$(date '+%Y-%m-%d_%H%M').pub"
+warning "Public key location in storage: ~/storage/shared/id_rsa_$(date '+%Y-%m-%d_%H%M').pub"

@@ -126,11 +126,11 @@ We welcome enhancement suggestions! Enhancement suggestions are tracked as GitHu
 3. **Use meaningful variable names**
    ```bash
    # Good
-   SSH_KEY_PATH="~/.ssh/id_rsa_git"
+   SSH_KEY_PATH="~/.ssh/id_rsa"
    REPO_URL="git@github.com:user/repo.git"
    
    # Avoid
-   KEY="~/.ssh/id_rsa_git"
+   KEY="~/.ssh/id_rsa"
    URL="git@github.com:user/repo.git"
    ```
 
