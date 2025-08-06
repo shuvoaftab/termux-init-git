@@ -6,20 +6,7 @@
 # Don't exit on first error - we want to handle errors gracefully
 set -u  # Exit on undefined variables instead
 
-REPO_URL    # Show simple next steps
-    if [ -d "$INSTALL_DIR" ]; then
-        echo ""
-        success "🎉 Installation complete!"
-        echo ""
-        success "🚀 To start setup, run these commands:"
-        echo ""
-        echo "cd $INSTALL_DIR"
-        echo "./init-keys.sh"
-        echo ""
-        warning "📖 Please review the scripts before running them!"
-        echo ""
-        info "💡 Copy and paste the commands above to continue"
-    fiithub.com/shuvoaftab/termux-init-git"
+REPO_URL="https://github.com/shuvoaftab/termux-init-git"
 INSTALL_DIR="$HOME/termux-init-git"
 LOG_FILE="$HOME/termux-init-git-install.log"
 
