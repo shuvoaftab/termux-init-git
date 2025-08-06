@@ -162,8 +162,8 @@ else
 fi
 
 echo ""
-info "� Next Steps:"
+info "📋 Next Steps:"
 echo "1. Add the public key to GitHub (Settings > Deploy Keys) for your private repo"
 echo "2. Run: ./git-clone.sh"
 echo ""
-warning "Public key location in storage: ~/storage/shared/id_rsa_git_$(date '+%Y-%m-%d_%H:%M').pub"
+warning "Public key location in storage: ~/storage/shared/id_rsa_git_$(date '+%Y-%m-%d_%H%M').pub"

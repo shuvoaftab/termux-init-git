@@ -6,7 +6,20 @@
 # Don't exit on first error - we want to handle errors gracefully
 set -u  # Exit on undefined variables instead
 
-REPO_URL="https://github.com/shuvoaftab/termux-init-git"
+REPO_URL    # Show simple next steps
+    if [ -d "$INSTALL_DIR" ]; then
+        echo ""
+        success "🎉 Installation complete!"
+        echo ""
+        success "🚀 To start setup, run these commands:"
+        echo ""
+        echo "cd $INSTALL_DIR"
+        echo "./init-keys.sh"
+        echo ""
+        warning "📖 Please review the scripts before running them!"
+        echo ""
+        info "💡 Copy and paste the commands above to continue"
+    fiithub.com/shuvoaftab/termux-init-git"
 INSTALL_DIR="$HOME/termux-init-git"
 LOG_FILE="$HOME/termux-init-git-install.log"
 
@@ -252,28 +265,16 @@ main() {
     
     log "Installation completed: $(date)"
     
-    # Create a quick setup script
+    # Show simple next steps
     if [ -d "$INSTALL_DIR" ]; then
         echo ""
         success "🎉 Installation complete!"
-        
-        # Create a convenience script that actually works
-        cat > "$HOME/termux-git-setup.sh" << EOF
-#!/data/data/com.termux/files/usr/bin/bash
-echo "🔐 Entering termux-init-git directory..."
-cd "$INSTALL_DIR" || exit 1
-echo "📍 Current directory: \$(pwd)"
-echo "💡 Run './init-keys.sh' to start setup"
-exec bash
-EOF
-        chmod +x "$HOME/termux-git-setup.sh"
-        
         echo ""
-        info "💡 Two ways to start:"
-        echo "1. cd $INSTALL_DIR && ./init-keys.sh"
-        echo "2. ~/termux-git-setup.sh (opens shell in project directory)"
+        success "🚀 To start setup, copy and run this command:"
         echo ""
-        warning "📍 Note: After running option 2, you'll be in the project directory"
+        info "cd $INSTALL_DIR && ./init-keys.sh"
+        echo ""
+        warning "📖 Please review the scripts before running them!"
     fi
 }
 
