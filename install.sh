@@ -45,9 +45,16 @@ check_dependencies() {
     
     local missing_deps=()
     
-    for dep in git curl; do
-        if ! command -v "$dep" >/dev/null 2>&1; then
-            missing_deps+=("$dep")
+    for dep in git curl openssh; do
+        if [ "$dep" = "openssh" ]; then
+            # Check for ssh-keygen instead of openssh command
+            if ! command -v ssh-keygen >/dev/null 2>&1; then
+                missing_deps+=("openssh")
+            fi
+        else
+            if ! command -v "$dep" >/dev/null 2>&1; then
+                missing_deps+=("$dep")
+            fi
         fi
     done
     
