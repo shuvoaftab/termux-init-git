@@ -257,17 +257,23 @@ main() {
         echo ""
         success "🎉 Installation complete!"
         
-        # Create a convenience script
-        cat > "$HOME/termux-git-setup.sh" << 'EOF'
+        # Create a convenience script that actually works
+        cat > "$HOME/termux-git-setup.sh" << EOF
 #!/data/data/com.termux/files/usr/bin/bash
-cd "$HOME/termux-init-git" && exec bash
+echo "🔐 Entering termux-init-git directory..."
+cd "$INSTALL_DIR" || exit 1
+echo "📍 Current directory: \$(pwd)"
+echo "💡 Run './init-keys.sh' to start setup"
+exec bash
 EOF
         chmod +x "$HOME/termux-git-setup.sh"
         
         echo ""
         info "💡 Two ways to start:"
         echo "1. cd $INSTALL_DIR && ./init-keys.sh"
-        echo "2. ~/termux-git-setup.sh (then run ./init-keys.sh)"
+        echo "2. ~/termux-git-setup.sh (opens shell in project directory)"
+        echo ""
+        warning "📍 Note: After running option 2, you'll be in the project directory"
     fi
 }
 

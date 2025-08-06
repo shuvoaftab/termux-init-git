@@ -5,9 +5,14 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Colored output functions
+NC='\033[0m' # No Coecho ""
+info "📋 Next Steps:"
+echo "1. Add the public key to GitHub (Settings > Deploy Keys) for your private repo"
+echo "2. Run: ./git-clone.sh"
+echo ""
+warning "Public key locations in storage:"
+info "- Timestamped: ~/storage/shared/id_rsa_git_$(date '+%Y-%m-%d_%H%M').pub"
+info "- Latest: ~/storage/shared/id_rsa_git.pub" Colored output functions
 info() {
     echo -e "${BLUE}ℹ️  $1${NC}"
 }
@@ -99,8 +104,8 @@ fi
 
 # Copy public key to shared storage with timestamp
 if [ -d ~/storage/shared ]; then
-    # Generate timestamp in Y-m-d HH:MM format
-    TIMESTAMP=$(date '+%Y-%m-%d_%H:%M')
+    # Generate timestamp in Y-m-d_HHMM format (no colons for filename compatibility)
+    TIMESTAMP=$(date '+%Y-%m-%d_%H%M')
     EXPORT_FILENAME="id_rsa_git_${TIMESTAMP}.pub"
     
     cp "$KEY.pub" ~/storage/shared/"$EXPORT_FILENAME"
