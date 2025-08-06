@@ -1,0 +1,164 @@
+name: Bug Report
+description: File a bug report to help us improve
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees:
+  - shuvoaftab
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! 🐛
+        
+        Please provide as much detail as possible to help us reproduce and fix the issue.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched existing issues to ensure this bug hasn't been reported
+          required: true
+        - label: I have read the [FAQ](../FAQ.md) and [troubleshooting guide](../examples/troubleshooting.sh)
+          required: true
+        - label: I am using the latest version of the scripts
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Tell us what happened!
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed steps to reproduce the behavior
+      placeholder: |
+        1. Run command '...'
+        2. See error '...'
+      value: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe the expected outcome
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what actually occurred
+    validations:
+      required: true
+
+  - type: dropdown
+    id: termux-version
+    attributes:
+      label: Termux Version
+      description: What version of Termux are you running?
+      options:
+        - "0.118.0 (Latest)"
+        - "0.117.0"
+        - "0.116.0" 
+        - "Older version"
+        - "F-Droid version"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: android-version
+    attributes:
+      label: Android Version
+      description: What version of Android are you using?
+      options:
+        - "Android 14"
+        - "Android 13"
+        - "Android 12"
+        - "Android 11"
+        - "Android 10"
+        - "Android 9"
+        - "Android 8"
+        - "Android 7"
+        - "Other"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device Information
+      description: Device model and manufacturer
+      placeholder: "e.g., Samsung Galaxy S21, Google Pixel 6"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: Device Architecture
+      description: CPU architecture (run `uname -m` in Termux)
+      options:
+        - "aarch64 (64-bit ARM)"
+        - "arm (32-bit ARM)"
+        - "x86_64 (64-bit Intel)"
+        - "i686 (32-bit Intel)"
+        - "Unknown"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: Please include relevant logs from ~/git-ssh-setup.log or terminal output
+      placeholder: Paste error logs here
+      render: shell
+
+  - type: textarea
+    id: ssh-config
+    attributes:
+      label: SSH Configuration
+      description: Content of ~/.ssh/config (remove any sensitive information)
+      placeholder: Paste SSH config here (if relevant)
+      render: shell
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here
+      placeholder: |
+        - Are you behind a corporate firewall?
+        - Have you modified the scripts?
+        - Any other relevant information?
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Final Checklist
+      description: Please confirm before submitting
+      options:
+        - label: I have removed any sensitive information from logs and configurations
+          required: true
+        - label: I have provided sufficient detail for reproduction
+          required: true
+        - label: I understand this is a public issue tracker
+          required: true

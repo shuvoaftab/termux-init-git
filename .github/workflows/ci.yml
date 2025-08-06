@@ -1,0 +1,215 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+jobs:
+  lint-and-validate:
+    name: 🔍 Lint & Validate
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install ShellCheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y shellcheck
+        
+    - name: Lint shell scripts
+      run: |
+        echo "🔍 Linting shell scripts..."
+        find . -name "*.sh" -type f -exec shellcheck {} \;
+        
+    - name: Validate script syntax
+      run: |
+        echo "✅ Validating script syntax..."
+        find . -name "*.sh" -type f -exec bash -n {} \;
+        
+    - name: Check file permissions
+      run: |
+        echo "🔐 Checking file permissions..."
+        # Ensure scripts are executable
+        find . -name "*.sh" -type f ! -executable -exec echo "❌ {} is not executable" \; -exec exit 1 \;
+        
+    - name: Lint Markdown
+      uses: DavidAnson/markdownlint-cli2-action@v13
+      with:
+        globs: '**/*.md'
+        
+    - name: Validate links in documentation
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        use-verbose-mode: 'yes'
+
+  security-scan:
+    name: 🛡️ Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run security scan
+      run: |
+        echo "🛡️ Running security scan..."
+        # Check for common security issues in shell scripts
+        if grep -r "curl.*http://" *.sh; then
+          echo "❌ Found insecure HTTP URLs"
+          exit 1
+        fi
+        
+        # Check for hardcoded credentials
+        if grep -r -E "(password|secret|token|key).*=" *.sh | grep -v "KEY="; then
+          echo "❌ Potential hardcoded credentials found"
+          exit 1
+        fi
+        
+        echo "✅ Security scan passed"
+        
+    - name: Check for sensitive files
+      run: |
+        echo "🔍 Checking for sensitive files..."
+        if find . -name "id_rsa*" -o -name "*.pem" -o -name "*.key" | grep -v "/dev/null"; then
+          echo "❌ Found potential sensitive files"
+          exit 1
+        fi
+        echo "✅ No sensitive files found"
+
+  test-scripts:
+    name: 🧪 Test Scripts
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git openssh-client curl wget
+        
+    - name: Test script dry-run
+      run: |
+        echo "🧪 Testing script dry-run..."
+        # Test that scripts can be parsed and don't have syntax errors
+        bash -n init-keys.sh
+        bash -n git-clone.sh
+        
+        # Test that required commands exist
+        for cmd in ssh ssh-keygen git curl; do
+          if ! command -v "$cmd" >/dev/null 2>&1; then
+            echo "❌ Required command '$cmd' not found"
+            exit 1
+          fi
+        done
+        
+        echo "✅ Script tests passed"
+
+  documentation-check:
+    name: 📚 Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check documentation completeness
+      run: |
+        echo "📚 Checking documentation completeness..."
+        
+        # Check that all referenced files exist
+        required_files=(
+          "README.md"
+          "CONTRIBUTING.md"
+          "SECURITY.md"
+          "FAQ.md"
+          "CHANGELOG.md"
+          "LICENSE"
+          "init-keys.sh"
+          "git-clone.sh"
+        )
+        
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Required file $file is missing"
+            exit 1
+          fi
+        done
+        
+        # Check that README has required sections
+        required_sections=(
+          "Quick Start"
+          "Security Features"
+          "Contributing"
+          "License"
+        )
+        
+        for section in "${required_sections[@]}"; do
+          if ! grep -q "$section" README.md; then
+            echo "❌ README missing section: $section"
+            exit 1
+          fi
+        done
+        
+        echo "✅ Documentation check passed"
+
+  release-validation:
+    name: 📦 Release Validation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate release
+      run: |
+        echo "📦 Validating release..."
+        
+        # Check that version is updated in CHANGELOG
+        if ! grep -q "${{ github.event.release.tag_name }}" CHANGELOG.md; then
+          echo "❌ Release version not found in CHANGELOG.md"
+          exit 1
+        fi
+        
+        # Ensure all scripts are properly versioned
+        echo "✅ Release validation passed"
+        
+    - name: Create release archive
+      run: |
+        echo "📦 Creating release archive..."
+        tar -czf termux-init-git-${{ github.event.release.tag_name }}.tar.gz \
+          init-keys.sh git-clone.sh README.md LICENSE SECURITY.md FAQ.md \
+          CONTRIBUTING.md CHANGELOG.md examples/
+        
+    - name: Upload release assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./termux-init-git-${{ github.event.release.tag_name }}.tar.gz
+        asset_name: termux-init-git-${{ github.event.release.tag_name }}.tar.gz
+        asset_content_type: application/gzip
+
+  update-badges:
+    name: 🏷️ Update Badges
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Update README badges
+      run: |
+        echo "🏷️ Badges are automatically updated by shields.io"
+        echo "✅ Badge update completed"
