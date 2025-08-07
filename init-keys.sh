@@ -22,7 +22,7 @@ GIT_CLONE_SCRIPT_URL="https://raw.githubusercontent.com/shuvoaftab/termux-init-g
 
 # Colored output functions
 info() {
-    echo -e "${BLUE}ℹ️  $1${NC}"
+    echo -e "${BLUE}⌘  $1${NC}"
 }
 
 success() {
@@ -30,7 +30,7 @@ success() {
 }
 
 warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}"
+    echo -e "${YELLOW}🚸  $1${NC}"
 }
 
 error() {
@@ -251,14 +251,14 @@ setup_storage_and_export() {
         echo "🔐 Requesting Storage Permission"
         echo "-------------------------------"
         info "Setting up storage access..."
-        warning "⚠️ Please grant storage permission when prompted"
+        warning "🚸 Please grant storage permission when prompted"
         termux-setup-storage
         sleep 3
         
         if [ -d ~/storage ]; then
             success "✅ Storage access granted"
         else
-            warning "⚠️ Storage access may not be fully ready"
+            warning "🚸 Storage access may not be fully ready"
         fi
     else
         success "✅ Storage access already available"
@@ -277,14 +277,14 @@ setup_storage_and_export() {
         if cp "$KEY_PATH.pub" ~/storage/shared/"$EXPORT_FILENAME"; then
             success "✅ Public key exported as: $EXPORT_FILENAME"
         else
-            warning "⚠️ Failed to create timestamped copy"
+            warning "🚸 Failed to create timestamped copy"
         fi
         
         # Create latest version
         if cp "$KEY_PATH.pub" ~/storage/shared/id_rsa.pub; then
             success "✅ Also saved as: id_rsa.pub (latest)"
         else
-            warning "⚠️ Failed to create latest copy"
+            warning "🚸 Failed to create latest copy"
         fi
         
         echo ""
@@ -293,7 +293,7 @@ setup_storage_and_export() {
         echo "   • ~/storage/shared/id_rsa.pub"
         
     else
-        warning "⚠️ Could not access shared storage"
+        warning "🚸 Could not access shared storage"
         info "Please run 'termux-setup-storage' manually if needed"
     fi
     
@@ -379,7 +379,7 @@ download_git_clone_script() {
             success "✅ Downloaded git-clone.sh using curl"
             download_success=true
         else
-            warning "⚠️ Failed to download with curl"
+            warning "🚸 Failed to download with curl"
         fi
     fi
     
@@ -391,7 +391,7 @@ download_git_clone_script() {
             success "✅ Downloaded git-clone.sh using wget"
             download_success=true
         else
-            warning "⚠️ Failed to download with wget"
+            warning "🚸 Failed to download with wget"
         fi
     fi
     
