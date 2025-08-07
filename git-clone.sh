@@ -309,9 +309,12 @@ setup_ssh_service() {
         bash "$SSH_SERVICE_SCRIPT" install | tee -a "$LOG"
 
         log "🚀 Starting SSH service..."
+        # Create temp file in a location that works in Termux
+        TEMP_OUTPUT="$HOME/.ssh_start_output_$$"
+        
         # Use timeout to prevent hanging and capture output properly
-        if timeout 30s bash "$SSH_SERVICE_SCRIPT" start > /tmp/ssh_start_output.txt 2>&1; then
-            SSH_OUTPUT=$(cat /tmp/ssh_start_output.txt)
+        if timeout 30s bash "$SSH_SERVICE_SCRIPT" start > "$TEMP_OUTPUT" 2>&1; then
+            SSH_OUTPUT=$(cat "$TEMP_OUTPUT")
             echo "$SSH_OUTPUT" | tee -a "$LOG"
             
             # Give the service a moment to start
@@ -334,12 +337,37 @@ setup_ssh_service() {
             fi
             
             # Clean up temp file
-            rm -f /tmp/ssh_start_output.txt
+            rm -f "$TEMP_OUTPUT"
         else
             log "❌ SSH service start command timed out or failed"
-            log "💡 Try manually: bash $SSH_SERVICE_SCRIPT start"
+            log "💡 Attempting direct SSH server start..."
+            
+            # Fallback: Try direct sshd start
+            SSHD_CONF="$DEST/app/production/ssh/sshd_config"
+            if [ -f "$SSHD_CONF" ]; then
+                log "🔧 Starting SSH server directly: sshd -f $SSHD_CONF -D &"
+                sshd -f "$SSHD_CONF" -D </dev/null &>/dev/null &
+                SSHD_PID=$!
+                sleep 3
+                
+                # Check if it's running
+                if pgrep -f sshd > /dev/null; then
+                    log "✅ SSH server started successfully via direct command"
+                    log "  → PID: $SSHD_PID"
+                    log "  → Port: 8022"
+                    log "  → Configuration: $SSHD_CONF"
+                    log "  → Logs: $DEST/resources/logs/ssh"
+                else
+                    log "❌ Direct SSH server start also failed"
+                    log "💡 Try manually: sshd -f $SSHD_CONF -D &"
+                fi
+            else
+                log "❌ SSH config not found at: $SSHD_CONF"
+                log "💡 Try manually: bash $SSH_SERVICE_SCRIPT start"
+            fi
+            
             # Clean up temp file
-            rm -f /tmp/ssh_start_output.txt
+            rm -f "$TEMP_OUTPUT"
         fi
     else
         log "❌ SSH service script not found at $SSH_SERVICE_SCRIPT"
