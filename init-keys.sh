@@ -1,6 +1,9 @@
-#!/data/data/com.termux/files/usr/bin/bash
-
-# Termux Git Init - SSH Key Generator
+#!/data/data/com.termux/files/usr/bin/b# Show summary of what will be done
+show_summary() {
+    echo "🔐 Termux Git Init - SSH Key Setup Summary (Step 2/3)"
+    echo "====================================================="
+    echo ""
+    info "📝 This script will perform the following actions:" Termux Git Init - SSH Key Generator
 # This script sets up SSH keys for secure Git access
 
 # Don't exit on first error - we want to handle errors gracefully
@@ -15,6 +18,10 @@ NC='\033[0m' # No Color
 
 # SSH key configuration
 KEY_PATH=~/.ssh/id_rsa
+
+# Git-clone script configuration
+GIT_CLONE_DOWNLOAD_ENABLED=false
+GIT_CLONE_SCRIPT_URL="https://raw.githubusercontent.com/shuvoaftab/termux-init-git/main/git-clone.sh"
 
 # Colored output functions
 info() {
@@ -58,10 +65,11 @@ show_summary() {
     echo "   • Update ~/.ssh/config with GitHub settings"
     echo "   • Use port 443 for firewall compatibility"
     echo ""
-    echo "6. 📥 Download git-clone.sh script for next step"
+    echo "6. � Show instructions for Step 3/3 (Repository Clone)"
     echo ""
     warning "💡 Note: You'll need to add the public key to your GitHub repository"
     warning "📖 Storage permission will be requested if not already granted"
+    warning "🚀 Step 3/3 will be executed via direct curl command"
     echo ""
 }
 
@@ -342,26 +350,39 @@ EOF
     echo ""
 }
 
-# Download git-clone script
+# Download git-clone script (conditional)
 download_git_clone_script() {
+    # Skip download if disabled
+    if [ "$GIT_CLONE_DOWNLOAD_ENABLED" = false ]; then
+        echo ""
+        echo "📥 STEP 6: GIT-CLONE SCRIPT DOWNLOAD (SKIPPED)"
+        echo "=============================================="
+        info "Git-clone script download is currently disabled"
+        warning "💡 Script will be executed directly via curl in Step 3/3"
+        echo ""
+        success "🎉 Proceeding to final instructions..."
+        echo "===================================="
+        echo ""
+        return 0
+    fi
+    
     echo ""
     echo "📥 STEP 6: DOWNLOADING GIT-CLONE SCRIPT"
     echo "========================================"
     info "Downloading git-clone script for repository setup..."
     echo ""
     
-    local script_url="https://raw.githubusercontent.com/shuvoaftab/termux-init-git/refs/heads/main/git-clone.sh"
     local download_success=false
     
     # Try curl first
     if command -v curl >/dev/null 2>&1; then
         echo "📡 Downloading with curl"
         echo "----------------------"
-        if curl -o git-clone.sh "$script_url"; then
+        if curl -o git-clone.sh "$GIT_CLONE_SCRIPT_URL"; then
             success "✅ Downloaded git-clone.sh using curl"
             download_success=true
         else
-            warning "🚸 Failed to download with curl"
+            warning "⚠️ Failed to download with curl"
         fi
     fi
     
@@ -369,11 +390,11 @@ download_git_clone_script() {
     if [ "$download_success" = false ] && command -v wget >/dev/null 2>&1; then
         echo "📡 Downloading with wget"
         echo "----------------------"
-        if wget -O git-clone.sh "$script_url"; then
+        if wget -O git-clone.sh "$GIT_CLONE_SCRIPT_URL"; then
             success "✅ Downloaded git-clone.sh using wget"
             download_success=true
         else
-            warning "🚸 Failed to download with wget"
+            warning "⚠️ Failed to download with wget"
         fi
     fi
     
@@ -407,8 +428,8 @@ show_final_instructions() {
     success "SSH key setup completed successfully!"
     echo ""
     
-    info "📋 Next Steps to Connect to GitHub:"
-    echo "-----------------------------------"
+    info "📋 Next Steps to Connect to GitHub (Before Step 3/3):"
+    echo "----------------------------------------------------"
     echo "1. 📱 Open your Android file manager"
     echo "2. 📂 Navigate to the shared storage folder"
     echo "3. 📄 Find and open: id_rsa.pub"
@@ -418,7 +439,18 @@ show_final_instructions() {
     echo "7. ➕ Click 'Add deploy key'"
     echo "8. 📝 Paste the public key content"
     echo "9. ✅ Save the deploy key"
-    echo "10. 🚀 Run: ./git-clone.sh"
+    echo ""
+    
+    echo "🚀 STEP 3/3: EXECUTE REPOSITORY CLONE"
+    echo "====================================="
+    info "After adding your public key to GitHub, run this command:"
+    echo ""
+    echo "curl -sL $GIT_CLONE_SCRIPT_URL | bash"
+    echo ""
+    warning "📖 Make sure to:"
+    echo "   • Add your public key to GitHub FIRST"
+    echo "   • Test SSH connection: ssh -T git@github.com"
+    echo "   • Have your repository URL ready"
     echo ""
     
     info "📍 Public Key Locations:"
@@ -432,20 +464,21 @@ show_final_instructions() {
     echo "---------------------"
     echo "   • View public key: cat ~/.ssh/id_rsa.pub"
     echo "   • Test SSH connection: ssh -T git@github.com"
-    echo "   • Start cloning: ./git-clone.sh"
+    echo "   • Execute Step 3/3: curl -sL $GIT_CLONE_SCRIPT_URL | bash"
     echo ""
     
     warning "📖 Important Notes:"
     echo "   • The private key stays secure in ~/.ssh/"
     echo "   • Only share the PUBLIC key (.pub file)"
     echo "   • Test the SSH connection before cloning"
+    echo "   • Step 3/3 will clone your repository directly"
     echo ""
 }
 
 # Main setup process
 main() {
-    echo "🔐 Termux Git Init - SSH Key Setup"
-    echo "=================================="
+    echo "🔐 Termux Git Init - SSH Key Setup (Step 2/3)"
+    echo "=============================================="
     echo "Setting up SSH keys for secure Git access..."
     echo ""
     
@@ -465,12 +498,12 @@ main() {
     show_final_instructions
     
     echo ""
-    echo "🎉 SSH KEY SETUP COMPLETED SUCCESSFULLY!"
-    echo "========================================"
+    echo "🎉 SSH KEY SETUP COMPLETED SUCCESSFULLY! (Step 2/3)"
+    echo "=================================================="
     echo ""
-    success "🚀 Ready for next step! Run this command:"
+    success "🚀 Ready for Step 3/3! After adding your public key to GitHub:"
     echo ""
-    info "./git-clone.sh"
+    info "curl -sL $GIT_CLONE_SCRIPT_URL | bash"
     echo ""
     warning "📖 Don't forget to add your public key to GitHub first!"
 }

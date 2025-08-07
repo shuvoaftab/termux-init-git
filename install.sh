@@ -10,6 +10,10 @@ REPO_URL="https://github.com/shuvoaftab/termux-init-git"
 INSTALL_DIR="$HOME/termux-init-git"
 LOG_FILE="$HOME/termux-init-git-install.log"
 
+# Repository download configuration
+REPO_DOWNLOAD_ENABLED=false
+INIT_KEYS_SCRIPT_URL="https://raw.githubusercontent.com/shuvoaftab/termux-init-git/main/init-keys.sh"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -41,8 +45,8 @@ error() {
 
 # Show summary of what will be done
 show_summary() {
-    echo "🔐 Termux Git Init - Installation Summary"
-    echo "========================================"
+    echo "🔐 Termux Git Init - Installation Summary (Step 1/3)"
+    echo "==================================================="
     echo ""
     info "📝 This script will perform the following actions:"
     echo ""
@@ -56,16 +60,10 @@ show_summary() {
     echo ""
     echo "2. 🔍 Check and verify all dependencies are working"
     echo ""
-    echo "3. 📥 Download termux-init-git repository from:"
-    echo "   $REPO_URL"
-    echo "   to: $INSTALL_DIR"
-    echo ""
-    echo "4. 🔧 Set up proper file permissions for scripts"
-    echo ""
-    echo "5. 📋 Display setup instructions and next steps"
+    echo "3. � Show instructions for Step 2/3 (SSH Key Setup)"
     echo ""
     warning "💡 Note: Package installation requires internet connection"
-    warning "📖 Please review the scripts before running them after installation"
+    warning "� Step 2/3 will be executed via direct curl command"
     echo ""
 }
 
@@ -247,8 +245,22 @@ check_dependencies() {
     echo ""
 }
 
-# Download the repository
+# Download the repository (conditional)
 download_repo() {
+    # Skip download if disabled
+    if [ "$REPO_DOWNLOAD_ENABLED" = false ]; then
+        echo ""
+        echo "📥 STEP 3: REPOSITORY DOWNLOAD (SKIPPED)"
+        echo "========================================"
+        info "Repository download is currently disabled"
+        warning "💡 Scripts will be executed directly via curl commands"
+        echo ""
+        success "🎉 Proceeding to final instructions..."
+        echo "===================================="
+        echo ""
+        return 0
+    fi
+    
     echo ""
     echo "📥 STEP 3: REPOSITORY DOWNLOAD"
     echo "=============================="
@@ -346,8 +358,22 @@ download_repo() {
     echo ""
 }
 
-# Set up permissions
+# Set up permissions (conditional)
 setup_permissions() {
+    # Skip permissions setup if repo download is disabled
+    if [ "$REPO_DOWNLOAD_ENABLED" = false ]; then
+        echo ""
+        echo "🔧 STEP 4: SETTING UP PERMISSIONS (SKIPPED)"
+        echo "==========================================="
+        info "Permission setup skipped - no local repository"
+        warning "💡 Scripts will be executed directly from remote URLs"
+        echo ""
+        success "🎉 Proceeding to final instructions..."
+        echo "===================================="
+        echo ""
+        return 0
+    fi
+    
     echo ""
     echo "🔧 STEP 4: SETTING UP PERMISSIONS"
     echo "================================="
@@ -367,7 +393,7 @@ setup_permissions() {
             chmod +x "$script"
             info "✅ Made $script executable"
         else
-            warning "🚸  $script not found - may need manual setup"
+            warning "⚠️  $script not found - may need manual setup"
         fi
     done
     
@@ -398,46 +424,75 @@ show_instructions() {
     echo ""
     echo "📋 STEP 5: SETUP COMPLETE - NEXT STEPS"
     echo "======================================"
-    success "Installation completed successfully!"
+    success "Package installation completed successfully!"
     echo ""
     
-    info "📋 Next Steps to Get Started:"
-    echo "-----------------------------"
-    echo "1. cd $INSTALL_DIR"
-    echo "2. ./init-keys.sh"
-    echo "3. Add the deploy key to your GitHub repository (Settings > Deploy Keys)"
-    echo "4. Edit git-clone.sh with your repository URL"
-    echo "5. ./git-clone.sh"
-    echo ""
+    if [ "$REPO_DOWNLOAD_ENABLED" = false ]; then
+        # Show direct curl execution instructions
+        echo "🚀 STEP 2/3: EXECUTE SSH KEY SETUP"
+        echo "=================================="
+        info "Now execute the SSH key setup script directly:"
+        echo ""
+        echo "curl -sL $INIT_KEYS_SCRIPT_URL | bash"
+        echo ""
+        warning "📖 This will:"
+        echo "   • Generate SSH keys for secure Git access"
+        echo "   • Configure SSH settings for GitHub"
+        echo "   • Export public key to Android storage"
+        echo "   • Show instructions for Step 3/3 (Repository Clone)"
+        echo ""
+        
+        info "� Alternative Commands:"
+        echo "------------------------"
+        echo "   • Test curl availability: curl --version"
+        echo "   • Manual download: wget $INIT_KEYS_SCRIPT_URL"
+        echo "   • View script first: curl -s $INIT_KEYS_SCRIPT_URL"
+        echo ""
+        
+    else
+        # Show traditional local file execution
+        info "📋 Next Steps to Get Started:"
+        echo "-----------------------------"
+        echo "1. cd $INSTALL_DIR"
+        echo "2. ./init-keys.sh"
+        echo "3. Add the deploy key to your GitHub repository (Settings > Deploy Keys)"
+        echo "4. Edit git-clone.sh with your repository URL"
+        echo "5. ./git-clone.sh"
+        echo ""
+        
+        info "🔧 Quick Commands (after cd $INSTALL_DIR):"
+        echo "-----------------------------------------"
+        echo "- View README: cat README.md"
+        echo "- Start setup: ./init-keys.sh"
+        echo "- Get help: ./init-keys.sh --help"
+        echo "- Troubleshoot: ./examples/troubleshooting.sh"
+        echo "- View logs: cat $LOG_FILE"
+        echo ""
+        
+        success "🚀 Quick start:"
+        info "cd $INSTALL_DIR && ./init-keys.sh"
+        echo ""
+    fi
     
-    info "📚 Available Documentation:"
+    info "� Available Documentation:"
     echo "--------------------------"
-    echo "- README.md - Complete setup guide"
-    echo "- FAQ.md - Frequently asked questions"  
-    echo "- CONTRIBUTING.md - Contribution guidelines"
-    echo "- examples/ - Advanced usage examples"
+    echo "- README: $REPO_URL#readme"
+    echo "- FAQ: $REPO_URL/blob/main/FAQ.md"  
+    echo "- Contributing: $REPO_URL/blob/main/CONTRIBUTING.md"
+    echo "- Examples: $REPO_URL/tree/main/examples"
     echo ""
     
-    info "🔧 Quick Commands (after cd $INSTALL_DIR):"
-    echo "-----------------------------------------"
-    echo "- View README: cat README.md"
-    echo "- Start setup: ./init-keys.sh"
-    echo "- Get help: ./init-keys.sh --help"
-    echo "- Troubleshoot: ./examples/troubleshooting.sh"
-    echo "- View logs: cat $LOG_FILE"
-    echo ""
-    
-    warning "📖 Please review the scripts before running them!"
-    echo ""
-    success "🚀 Quick start:"
-    info "cd $INSTALL_DIR && ./init-keys.sh"
+    warning "📖 Important Notes:"
+    echo "   • Package installation creates foundation for Git setup"
+    echo "   • SSH key setup (Step 2/3) is required for secure access"
+    echo "   • Repository clone (Step 3/3) will download your projects"
     echo ""
 }
 
 # Main installation process
 main() {
-    echo "🔐 Termux Git Init - Installer"
-    echo "=============================="
+    echo "🔐 Termux Git Init - Installer (Step 1/3)"
+    echo "========================================="
     echo "Installing secure Git setup for Termux..."
     echo ""
     
@@ -482,22 +537,37 @@ main() {
     
     # Show final completion message
     echo ""
-    echo "🎉 INSTALLATION COMPLETED SUCCESSFULLY!"
-    echo "====================================="
+    echo "🎉 INSTALLATION COMPLETED SUCCESSFULLY! (Step 1/3)"
+    echo "================================================="
     
-    # Show simple next steps
-    if [ -d "$INSTALL_DIR" ]; then
+    # Show appropriate next steps based on configuration
+    if [ "$REPO_DOWNLOAD_ENABLED" = false ]; then
         echo ""
-        success "🚀 Ready to start! Copy and run this command:"
+        success "🚀 Ready for Step 2/3! Execute SSH key setup:"
         echo ""
-        info "cd $INSTALL_DIR && ./init-keys.sh"
+        info "curl -sL $INIT_KEYS_SCRIPT_URL | bash"
         echo ""
-        warning "📖 Please review the scripts before running them!"
+        warning "📖 This will set up SSH keys for secure Git access"
         echo ""
         info "💡 For help and documentation:"
-        echo "   - Run: cd $INSTALL_DIR && cat README.md"
-        echo "   - View examples: ls $INSTALL_DIR/examples/"
+        echo "   - View repository: $REPO_URL"
         echo "   - Check logs: cat $LOG_FILE"
+        echo "   - Test curl: curl --version"
+    else
+        # Show simple next steps for local installation
+        if [ -d "$INSTALL_DIR" ]; then
+            echo ""
+            success "🚀 Ready to start! Copy and run this command:"
+            echo ""
+            info "cd $INSTALL_DIR && ./init-keys.sh"
+            echo ""
+            warning "📖 Please review the scripts before running them!"
+            echo ""
+            info "💡 For help and documentation:"
+            echo "   - Run: cd $INSTALL_DIR && cat README.md"
+            echo "   - View examples: ls $INSTALL_DIR/examples/"
+            echo "   - Check logs: cat $LOG_FILE"
+        fi
     fi
 }
 
@@ -517,9 +587,10 @@ show_help() {
     echo "2. Ask for user confirmation to proceed"
     echo "3. Install essential packages (wget, curl, vim, busybox, git, openssh)"
     echo "4. Check and verify all dependencies are working"
-    echo "5. Download the termux-init-git repository"
-    echo "6. Set up proper file permissions"
-    echo "7. Show next steps for configuration"
+    echo "5. Show instructions for executing Step 2/3 (SSH key setup) via curl"
+    echo ""
+    echo "Note: Repository download is currently disabled for streamlined execution."
+    echo "Step 2/3 and 3/3 will be executed directly via curl commands."
     echo ""
     echo "For more information, visit:"
     echo "$REPO_URL"

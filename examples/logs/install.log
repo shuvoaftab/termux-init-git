@@ -1,0 +1,407 @@
+~ $ curl -sL https://raw.githubusercontent.com/shuvoaftab/termux-init-git/main/install.sh | bash
+🔐 Termux Git Init - Installer                          ==============================
+Installing secure Git setup for Termux...               
+🔐 Termux Git Init - Installation Summary               ========================================
+
+ℹ️  📝 This script will perform the following actions:
+                                                        1. 📦 Install required packages:
+   • wget - Download utility                               • curl - HTTP client
+   • vim - Text editor
+   • busybox - Unix utilities                              • git - Version control system
+   • openssh - SSH client/server
+
+2. 🔍 Check and verify all dependencies are working     
+3. 📥 Download termux-init-git repository from:            https://github.com/shuvoaftab/termux-init-git
+   to: /data/data/com.termux/files/home/termux-init-git 
+4. 🔧 Set up proper file permissions for scripts
+
+5. 📋 Display setup instructions and next steps
+                                                        ⚠️  💡 Note: Package installation requires internet connection
+⚠️  📖 Please review the scripts before running them after installation
+
+Do you want to proceed with the installation? (y/N): y
+✅ Installation confirmed. Proceeding...
+Installation started: Thu Aug  7 15:19:25 +06 2025
+HOME directory: /data/data/com.termux/files/home
+Install directory: /data/data/com.termux/files/home/termux-init-git
+Log file: /data/data/com.termux/files/home/termux-init-git-install.log
+ℹ️  Checking environment...
+ℹ️  Current shell: bash
+ℹ️  Working directory: /data/data/com.termux/files/home
+
+📦 STEP 1: PACKAGE INSTALLATION
+================================
+ℹ️  Installing essential packages for Termux Git setup...
+
+🔄 Updating Package Repository
+-----------------------------
+ℹ️  Updating package list...
+Checking availability of current mirror:
+[*] https://mirror.nevacloud.com/applications/termux/termux-main: ok
+Hit:1 https://mirror.nevacloud.com/applications/termux/termux-main stable InRelease
+Reading package lists... Done
+Building dependency tree... Done
+37 packages can be upgraded. Run 'apt list --upgradable' to see them.
+✅ Package list updated successfully
+
+📋 Installing Package 1 of 6: wget
+-------------------------------------------
+ℹ️  Package: wget - Download utility for fetching files
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+ℹ️  Installing wget...
+Checking availability of current mirror:
+[*] https://mirror.nevacloud.com/applications/termux/termux-main: ok
+Reading package lists... Done
+Building dependency tree... Done
+The following additional packages will be installed:
+  libuuid
+The following NEW packages will be installed:
+  libuuid wget
+0 upgraded, 2 newly installed, 0 to remove and 37 not upgraded.
+Need to get 297 kB of archives.
+After this operation, 893 kB of additional disk space will be used.
+Get:1 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 libuuid aarch64 2.40.2-4 [15.0 kB]
+Get:2 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 wget aarch64 1.25.0 [282 kB]
+Fetched 297 kB in 1s (276 kB/s)
+Selecting previously unselected package libuuid.
+(Reading database ... 4470 files and directories currently installed.)
+Preparing to unpack .../libuuid_2.40.2-4_aarch64.deb ...
+Unpacking libuuid (2.40.2-4) ...
+Selecting previously unselected package wget.
+Preparing to unpack .../wget_1.25.0_aarch64.deb ...
+Unpacking wget (1.25.0) ...
+Setting up libuuid (2.40.2-4) ...
+Setting up wget (1.25.0) ...
+✅ wget installed successfully
+
+📋 Installing Package 2 of 6: curl
+-------------------------------------------
+ℹ️  Package: curl - HTTP client for web requests
+✅ curl is already installed
+
+📋 Installing Package 3 of 6: vim
+-------------------------------------------
+ℹ️  Package: vim - Text editor for configuration files
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+ℹ️  Installing vim...
+Checking availability of current mirror:
+[*] https://mirror.nevacloud.com/applications/termux/termux-main: ok
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  xxd
+Suggested packages:
+  libluajit perl python ruby tcl
+The following NEW packages will be installed:
+  vim xxd
+0 upgraded, 2 newly installed, 0 to remove and 37 not upgraded.
+Need to get 6503 kB of archives.
+After this operation, 34.7 MB of additional disk space will be used.
+Get:1 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 vim aarch64 9.1.1550 [6490 kB]
+Get:2 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 xxd aarch64 9.1.1550 [13.1 kB]
+Fetched 6503 kB in 6s (1148 kB/s)
+Selecting previously unselected package vim.
+(Reading database ... 4480 files and directories currently installed.)
+Preparing to unpack .../vim_9.1.1550_aarch64.deb ...
+Unpacking vim (9.1.1550) ...
+Selecting previously unselected package xxd.
+Preparing to unpack .../xxd_9.1.1550_aarch64.deb ...
+Unpacking xxd (9.1.1550) ...
+Setting up vim (9.1.1550) ...
+update-alternatives: using /data/data/com.termux/files/usr/libexec/vim/vim to provide /data/data/com.termux/files/usr/bin/vim (vim) in auto mode
+update-alternatives: using /data/data/com.termux/files/usr/libexec/vim/ex to provide /data/data/com.termux/files/usr/bin/ex (ex) in auto mode
+update-alternatives: using /data/data/com.termux/files/usr/libexec/vim/view to provide /data/data/com.termux/files/usr/bin/view (view) in auto mode
+update-alternatives: using /data/data/com.termux/files/usr/libexec/vim/vimdiff to provide /data/data/com.termux/files/usr/bin/vimdiff (vimdiff) in auto mode
+update-alternatives: using /data/data/com.termux/files/usr/libexec/vim/vimtutor to provide /data/data/com.termux/files/usr/bin/vimtutor (vimtutor) in auto mode
+update-alternatives: using /data/data/com.termux/files/usr/bin/vim to provide /data/data/com.termux/files/usr/bin/editor (editor) in auto mode
+update-alternatives: using /data/data/com.termux/files/usr/bin/vim to provide /data/data/com.termux/files/usr/bin/vi (vi) in auto mode
+Setting up xxd (9.1.1550) ...
+✅ vim installed successfully
+
+📋 Installing Package 4 of 6: busybox
+-------------------------------------------
+ℹ️  Package: busybox - Unix utilities collection
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+ℹ️  Installing busybox...
+Checking availability of current mirror:
+[*] https://mirror.nevacloud.com/applications/termux/termux-main: ok
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following NEW packages will be installed:
+  busybox
+0 upgraded, 1 newly installed, 0 to remove and 37 not upgraded.
+Need to get 465 kB of archives.
+After this operation, 1044 kB of additional disk space will be used.
+Get:1 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 busybox aarch64 1.37.0-1 [465 kB]
+Fetched 465 kB in 1s (552 kB/s)
+Selecting previously unselected package busybox.
+(Reading database ... 6466 files and directories currently installed.)
+Preparing to unpack .../busybox_1.37.0-1_aarch64.deb ...
+Unpacking busybox (1.37.0-1) ...
+Setting up busybox (1.37.0-1) ...
+update-alternatives: using /data/data/com.termux/files/usr/libexec/busybox/less to provide /data/data/com.termux/files/usr/bin/pager (pager) in auto mode
+update-alternatives: using /data/data/com.termux/files/usr/libexec/busybox/nc to provide /data/data/com.termux/files/usr/bin/nc (nc) in auto mode
+✅ busybox installed successfully
+
+📋 Installing Package 5 of 6: git
+-------------------------------------------
+ℹ️  Package: git - Version control system
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+ℹ️  Installing git...
+Checking availability of current mirror:
+[*] https://mirror.nevacloud.com/applications/termux/termux-main: ok
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following additional packages will be installed:
+  krb5 ldns libdb libedit libexpat libresolv-wrapper
+  openssh openssh-sftp-server termux-auth
+Suggested packages:
+  perl termux-services
+The following NEW packages will be installed:
+  git krb5 ldns libdb libedit libexpat
+  libresolv-wrapper openssh openssh-sftp-server
+  termux-auth
+0 upgraded, 10 newly installed, 0 to remove and 37 not upgraded.
+Need to get 7422 kB of archives.
+After this operation, 45.0 MB of additional disk space will be used.
+Get:1 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 libexpat aarch64 2.7.1 [87.8 kB]
+Get:2 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 git aarch64 2.50.1-1 [4549 kB]
+Get:3 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 libresolv-wrapper aarch64 1.1.7-4 [11.5 kB]
+Get:4 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 libdb aarch64 18.1.40-4 [495 kB]
+Get:5 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 krb5 aarch64 1.22 [905 kB]
+Get:6 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 ldns aarch64 1.8.4 [303 kB]
+Get:7 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 libedit aarch64 20240517-3.1-0 [79.2 kB]
+Get:8 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 openssh-sftp-server aarch64 10.0p2-8 [55.0 kB]
+Get:9 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 termux-auth aarch64 1.5.0 [6980 B]
+Get:10 https://mirror.nevacloud.com/applications/termux/termux-main stable/main aarch64 openssh aarch64 10.0p2-8 [930 kB]
+Fetched 7422 kB in 2s (4170 kB/s)
+Selecting previously unselected package libexpat.
+(Reading database ... 6494 files and directories currently installed.)
+Preparing to unpack .../0-libexpat_2.7.1_aarch64.deb ...
+Unpacking libexpat (2.7.1) ...
+Selecting previously unselected package git.
+Preparing to unpack .../1-git_2.50.1-1_aarch64.deb ...
+Unpacking git (2.50.1-1) ...
+Selecting previously unselected package libresolv-wrapper.
+Preparing to unpack .../2-libresolv-wrapper_1.1.7-4_aarch64.deb ...
+Unpacking libresolv-wrapper (1.1.7-4) ...
+Selecting previously unselected package libdb.
+Preparing to unpack .../3-libdb_18.1.40-4_aarch64.deb ...
+Unpacking libdb (18.1.40-4) ...
+Selecting previously unselected package krb5.
+Preparing to unpack .../4-krb5_1.22_aarch64.deb ...
+Unpacking krb5 (1.22) ...
+Selecting previously unselected package ldns.
+Preparing to unpack .../5-ldns_1.8.4_aarch64.deb ...
+Unpacking ldns (1.8.4) ...
+Selecting previously unselected package libedit.
+Preparing to unpack .../6-libedit_20240517-3.1-0_aarch64.deb ...
+Unpacking libedit (20240517-3.1-0) ...
+Selecting previously unselected package openssh-sftp-server.
+Preparing to unpack .../7-openssh-sftp-server_10.0p2-8_aarch64.deb ...
+Unpacking openssh-sftp-server (10.0p2-8) ...
+Selecting previously unselected package termux-auth.
+Preparing to unpack .../8-termux-auth_1.5.0_aarch64.deb ...
+Unpacking termux-auth (1.5.0) ...
+Selecting previously unselected package openssh.
+Preparing to unpack .../9-openssh_10.0p2-8_aarch64.deb ...
+Unpacking openssh (10.0p2-8) ...
+Setting up libedit (20240517-3.1-0) ...
+Setting up openssh-sftp-server (10.0p2-8) ...
+Setting up ldns (1.8.4) ...
+Setting up libexpat (2.7.1) ...
+Setting up git (2.50.1-1) ...
+Setting up libresolv-wrapper (1.1.7-4) ...
+Setting up termux-auth (1.5.0) ...
+Setting up libdb (18.1.40-4) ...
+Setting up krb5 (1.22) ...
+Setting up openssh (10.0p2-8) ...
+Generating public/private rsa key pair.
+Your identification has been saved in /data/data/com.termux/files/usr/etc/ssh/ssh_host_rsa_key
+Your public key has been saved in /data/data/com.termux/files/usr/etc/ssh/ssh_host_rsa_key.pub
+The key fingerprint is:
+SHA256:l3dOn59Oft2BQNTyMxKhgBPM3VnMX022EDzKgmrMG8s u0_a282@localhost
+The key's randomart image is:
++---[RSA 3072]----+
+|    o.+.. *++o..+|
+|     = ..o.* +.oo|
+|      . ..o * o. |
+|       . . * =   |
+|    o . S + + *  |
+|     *   . . = o.|
+|    o +       .o=|
+|     E        o *|
+|              .+o|
++----[SHA256]-----+
+Generating public/private ecdsa key pair.
+Your identification has been saved in /data/data/com.termux/files/usr/etc/ssh/ssh_host_ecdsa_key
+Your public key has been saved in /data/data/com.termux/files/usr/etc/ssh/ssh_host_ecdsa_key.pub
+The key fingerprint is:
+SHA256:qJ/lhrsosAYaJ+g+AbW1We8ziWXJJ8TyXHxu4O1Lg9Y u0_a282@localhost
+The key's randomart image is:
++---[ECDSA 256]---+
+|       . .       |
+|  . . o o + .    |
+| . o + B + =     |
+|. . o  .X o +    |
+|o     .=S+ =     |
+|*..  .. = o E    |
+|+*. .  ..+ . o   |
+|o+.  o.+.   .    |
+|o.... =+.        |
++----[SHA256]-----+
+Generating public/private ed25519 key pair.
+Your identification has been saved in /data/data/com.termux/files/usr/etc/ssh/ssh_host_ed25519_key
+Your public key has been saved in /data/data/com.termux/files/usr/etc/ssh/ssh_host_ed25519_key.pub
+The key fingerprint is:
+SHA256:CmmK7Dal+arzl6ZE5Boe1HofBPjZyHkpiDq+7GWGPM0 u0_a282@localhost
+The key's randomart image is:
++--[ED25519 256]--+
+|  ..             |
+| .. .            |
+|..=.=..          |
+|o+.B.=           |
+|ooo.*.  S        |
+|*=*+....         |
+|+B*E o.          |
+|+B= +            |
+|=OB=             |
++----[SHA256]-----+
+
+If you plan to use the 'ssh-agent'
+it is recommended to run it as a service.
+Run 'pkg i termux-services'
+to install the ('runit') service manager
+
+You can enable the ssh-agent service
+using 'sv-enable ssh-agent'
+You can also enable sshd to autostart
+using 'sv-enable sshd'
+✅ git installed successfully
+
+📋 Installing Package 6 of 6: openssh
+-------------------------------------------
+ℹ️  Package: openssh - SSH client and server tools
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+✅ openssh is already installed
+
+🔍 Verifying Critical Package Installation
+----------------------------------------
+✅ ✅ git is available
+✅ ✅ curl is available
+✅ ✅ ssh-keygen is available
+
+✅ 🎉 All essential packages are ready!
+====================================
+
+
+🔍 STEP 2: DEPENDENCY VERIFICATION
+==================================
+ℹ️  Checking if all required dependencies are working properly...
+
+✅ ✅ git is available
+✅ ✅ curl is available
+✅ ✅ ssh-keygen is available
+
+✅ 🎉 All dependencies are verified and working!
+===========================================
+
+
+📥 STEP 3: REPOSITORY DOWNLOAD
+==============================
+ℹ️  Downloading termux-init-git repository...
+
+⬇️  Cloning Repository
+--------------------
+ℹ️  Cloning repository from https://github.com/shuvoaftab/termux-init-git...
+Cloning into '/data/data/com.termux/files/home/termux-init-git'...
+remote: Enumerating objects: 90, done.
+remote: Counting objects: 100% (90/90), done.
+remote: Compressing objects: 100% (63/63), done.
+remote: Total 90 (delta 41), reused 70 (delta 24), pack-reused 0 (from 0)
+Receiving objects: 100% (90/90), 59.33 KiB | 552.00 KiB/s, done.
+Resolving deltas: 100% (41/41), done.
+✅ Repository downloaded to /data/data/com.termux/files/home/termux-init-git
+
+✅ 🎉 Repository download completed!
+===============================
+
+
+🔧 STEP 4: SETTING UP PERMISSIONS
+=================================
+ℹ️  Setting up file permissions for executable scripts...
+
+📋 Making Main Scripts Executable
+--------------------------------
+ℹ️  ✅ Made init-keys.sh executable
+ℹ️  ✅ Made git-clone.sh executable
+
+📁 Processing Example Scripts
+----------------------------
+ℹ️  ✅ Made 2 example scripts executable
+
+✅ 🎉 File permissions configured successfully!
+==========================================
+
+
+📋 STEP 5: SETUP COMPLETE - NEXT STEPS
+======================================
+✅ Installation completed successfully!
+
+ℹ️  📋 Next Steps to Get Started:
+-----------------------------
+1. cd /data/data/com.termux/files/home/termux-init-git
+2. ./init-keys.sh
+3. Add the deploy key to your GitHub repository (Settings > Deploy Keys)
+4. Edit git-clone.sh with your repository URL
+5. ./git-clone.sh
+
+ℹ️  📚 Available Documentation:
+--------------------------
+- README.md - Complete setup guide
+- FAQ.md - Frequently asked questions
+- CONTRIBUTING.md - Contribution guidelines
+- examples/ - Advanced usage examples
+
+ℹ️  🔧 Quick Commands (after cd /data/data/com.termux/files/home/termux-init-git):
+-----------------------------------------
+- View README: cat README.md
+- Start setup: ./init-keys.sh
+- Get help: ./init-keys.sh --help
+- Troubleshoot: ./examples/troubleshooting.sh
+- View logs: cat /data/data/com.termux/files/home/termux-init-git-install.log
+
+⚠️  📖 Please review the scripts before running them!
+
+✅ 🚀 Quick start:
+ℹ️  cd /data/data/com.termux/files/home/termux-init-git && ./init-keys.sh
+
+Installation completed: Thu Aug  7 15:19:46 +06 2025
+
+🎉 INSTALLATION COMPLETED SUCCESSFULLY!
+=====================================
+
+✅ 🚀 Ready to start! Copy and run this command:
+
+ℹ️  cd /data/data/com.termux/files/home/termux-init-git && ./init-keys.sh
+
+⚠️  📖 Please review the scripts before running them!
+
+ℹ️  💡 For help and documentation:
+   - Run: cd /data/data/com.termux/files/home/termux-init-git && cat README.md
+   - View examples: ls /data/data/com.termux/files/home/termux-init-git/examples/
+   - Check logs: cat /data/data/com.termux/files/home/termux-init-git-install.log
+~ $
