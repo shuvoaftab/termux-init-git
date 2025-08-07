@@ -28,34 +28,34 @@ log() {
 show_summary() {
     echo ""
     echo "╔═══════════════════════════════════════════════════╗"
-    echo "║        🚀 TERMUX-INIT-GIT: STEP 3/3 - GIT CLONE  ║"
-    echo "║          Repository Clone & SSH Service Setup     ║"
+    echo "║        🚀 TERMUX-INIT-GIT: STEP 3/3 - GIT CLONE     "
+    echo "║          Repository Clone & SSH Service Setup      "
     echo "╠═══════════════════════════════════════════════════╣"
-    echo "║ 📋 SUMMARY OF WHAT WILL BE DONE:                 ║"
-    echo "║                                                   ║"
-    echo "║ 🔐 1. SSH Connection Verification                ║"
-    echo "║     • Verify GitHub SSH access via port 443      ║"
-    echo "║     • Start SSH agent and load keys              ║"
-    echo "║     • Test authentication with GitHub            ║"
-    echo "║                                                   ║"
-    echo "║ 📦 2. Repository Cloning                         ║"
-    echo "║     • Clone: android-research/termux-namp        ║"
-    echo "║     • Setup repo contents in home directory      ║"
-    echo "║                                                   ║"
-    echo "║ 🔧 3. SSH Configuration                          ║"
-    echo "║     • Configure ~/.ssh directory & permissions   ║"
-    echo "║     • Add GitHub to known_hosts                   ║"
-    echo "║     • Setup authorized_keys from repository      ║"
-    echo "║                                                   ║"
-    echo "║ 🚀 4. SSH Service Setup                          ║"
-    echo "║     • Install SSH service daemon                 ║"
-    echo "║     • Start SSH service for remote access        ║"
-    echo "║                                                   ║"
-    echo "║ ⚠️  PREREQUISITES (from Step 2/3):               ║"
-    echo "║     • SSH public key must be added to GitHub     ║"
-    echo "║     • SSH key generated from previous step       ║"
-    echo "║                                                   ║"
-    echo "║ 📍 LOG FILE: ~/git-ssh-setup.log                ║"
+    echo "║ 📋 SUMMARY OF WHAT WILL BE DONE:                   "
+    echo "║                                                    "
+    echo "║ 🔐 1. SSH Connection Verification                  "
+    echo "║     • Verify GitHub SSH access via port 443        "
+    echo "║     • Start SSH agent and load keys                "
+    echo "║     • Test authentication with GitHub              "
+    echo "║                                                    "
+    echo "║ 📦 2. Repository Cloning                           "
+    echo "║     • Clone: android-research/termux-namp         "
+    echo "║     • Setup repo contents in home directory       "
+    echo "║                                                   "
+    echo "║ 🔧 3. SSH Configuration                           "
+    echo "║     • Configure ~/.ssh directory & permissions    "
+    echo "║     • Add GitHub to known_hosts                   "
+    echo "║     • Setup authorized_keys from repository       "
+    echo "║                                                   "
+    echo "║ 🚀 4. SSH Service Setup                           "
+    echo "║     • Install SSH service daemon                  "
+    echo "║     • Start SSH service for remote access         "
+    echo "║                                                    "
+    echo "║ ⚠️  PREREQUISITES (from Step 2/3):                 "
+    echo "║     • SSH public key must be added to GitHub       "
+    echo "║     • SSH key generated from previous step         "
+    echo "║                                                    "
+    echo "║ 📍 LOG FILE: ~/git-ssh-setup.log                   "
     echo "╚═══════════════════════════════════════════════════╝"
     echo ""
 }
@@ -115,15 +115,15 @@ retry_ssh_check() {
 
 setup_ssh_agent() {
     echo ""
-    echo "╔════════════════════════════════════════════════════════════════════════════════╗"
-    echo "║                          🔐 STEP 1: SSH CONNECTION VERIFICATION               ║"
-    echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+    echo "╔═══════════════════════════════════════════════════╗"
+    echo "║         🔐 STEP 1: SSH CONNECTION VERIFICATION     "
+    echo "╚═══════════════════════════════════════════════════╝"
     echo ""
     
     log "🔐 Verifying GitHub SSH access..."
 
     # Ensure SSH agent is running and keys are loaded
-    if [ -z "$SSH_AUTH_SOCK" ]; then
+    if [ -z "${SSH_AUTH_SOCK:-}" ]; then
         log "🚀 Starting SSH agent..."
         eval "$(ssh-agent -s)" | tee -a "$LOG"
         
@@ -136,7 +136,7 @@ setup_ssh_agent() {
     for key in ~/.ssh/id_*; do
         if [ -f "$key" ] && [ ! "${key##*.}" = "pub" ]; then
             log "🔑 Adding key to SSH agent: $key"
-            if [ -n "$SSH_AUTH_SOCK" ] && [ -S "$SSH_AUTH_SOCK" ]; then
+            if [ -n "${SSH_AUTH_SOCK:-}" ] && [ -S "${SSH_AUTH_SOCK:-}" ]; then
                 ssh-add "$key" 2>&1 | tee -a "$LOG"
             else
                 log "⚠️ SSH agent not available, skipping key addition"
@@ -150,9 +150,9 @@ setup_ssh_agent() {
 }
 
 clone_repository() {
-    echo "╔════════════════════════════════════════════════════════════════════════════════╗"
-    echo "║                            📦 STEP 2: REPOSITORY CLONING                      ║"
-    echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+    echo "╔═══════════════════════════════════════════════════╗"
+    echo "║           📦 STEP 2: REPOSITORY CLONING            "
+    echo "╚═══════════════════════════════════════════════════╝"
     echo ""
     
     if [ -d "$DEST/.git" ]; then
@@ -187,9 +187,9 @@ clone_repository() {
 }
 
 configure_ssh() {
-    echo "╔════════════════════════════════════════════════════════════════════════════════╗"
-    echo "║                           🔧 STEP 3: SSH CONFIGURATION                        ║"
-    echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+    echo "╔═══════════════════════════════════════════════════╗"
+    echo "║           🔧 STEP 3: SSH CONFIGURATION             "
+    echo "╚═══════════════════════════════════════════════════╝"
     echo ""
     
     log "📁 Ensuring ~/.ssh exists..."
@@ -217,9 +217,9 @@ configure_ssh() {
 }
 
 setup_ssh_service() {
-    echo "╔════════════════════════════════════════════════════════════════════════════════╗"
-    echo "║                           🚀 STEP 4: SSH SERVICE SETUP                        ║"
-    echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+    echo "╔═══════════════════════════════════════════════════╗"
+    echo "║           🚀 STEP 4: SSH SERVICE SETUP             "
+    echo "╚═══════════════════════════════════════════════════╝"
     echo ""
     
     if [ -f "$SSH_SERVICE_SCRIPT" ]; then
@@ -253,9 +253,9 @@ main() {
     configure_ssh
     setup_ssh_service
     
-    echo "╔════════════════════════════════════════════════════════════════════════════════╗"
-    echo "║                              ✅ SETUP COMPLETE                                ║"
-    echo "╚════════════════════════════════════════════════════════════════════════════════╝"
+    echo "╔═══════════════════════════════════════════════════╗"
+    echo "║                ✅ SETUP COMPLETE                   "
+    echo "╚═══════════════════════════════════════════════════╝"
     echo ""
     log "✅ Git clone and SSH service setup complete."
     log "📁 Repository cloned to: $DEST"
