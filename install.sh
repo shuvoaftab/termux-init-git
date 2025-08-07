@@ -24,7 +24,7 @@ log() {
 
 # Colored output functions
 info() {
-    echo -e "${BLUE}ℹ️  $1${NC}" | tee -a "$LOG_FILE"
+    echo -e "${BLUE}⌘  $1${NC}" | tee -a "$LOG_FILE"
 }
 
 success() {
@@ -32,7 +32,7 @@ success() {
 }
 
 warning() {
-    echo -e "${YELLOW}⚠️  $1${NC}" | tee -a "$LOG_FILE"
+    echo -e "${YELLOW}🚸  $1${NC}" | tee -a "$LOG_FILE"
 }
 
 error() {
@@ -367,7 +367,7 @@ setup_permissions() {
             chmod +x "$script"
             info "✅ Made $script executable"
         else
-            warning "⚠️  $script not found - may need manual setup"
+            warning "🚸  $script not found - may need manual setup"
         fi
     done
     
