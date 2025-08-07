@@ -27,38 +27,36 @@ log() {
 
 show_summary() {
     echo ""
-    echo "╔═══════════════════════════════════════════════════════════════════════════════╗"
-    echo "║                    🚀 TERMUX-INIT-GIT: STEP 3/3 - GIT CLONE                 ║"
-    echo "║                         Repository Clone & SSH Service Setup                 ║"
-    echo "╠═══════════════════════════════════════════════════════════════════════════════╣"
-    echo "║                                                                               ║"
-    echo "║ 📋 SUMMARY OF WHAT WILL BE DONE:                                             ║"
-    echo "║                                                                               ║"
-    echo "║ 🔐 1. SSH Connection Verification                                            ║"
-    echo "║     • Verify GitHub SSH access via port 443                                  ║"
-    echo "║     • Start SSH agent and load keys                                          ║"
-    echo "║     • Test authentication with GitHub                                        ║"
-    echo "║                                                                               ║"
-    echo "║ 📦 2. Repository Cloning                                                     ║"
-    echo "║     • Clone repository: android-research/termux-namp                         ║"
-    echo "║     • Setup repository contents in home directory                            ║"
-    echo "║                                                                               ║"
-    echo "║ 🔧 3. SSH Configuration                                                      ║"
-    echo "║     • Configure ~/.ssh directory and permissions                             ║"
-    echo "║     • Add GitHub to known_hosts                                              ║"
-    echo "║     • Setup authorized_keys from repository                                  ║"
-    echo "║                                                                               ║"
-    echo "║ 🚀 4. SSH Service Setup                                                      ║"
-    echo "║     • Install SSH service daemon                                             ║"
-    echo "║     • Start SSH service for remote access                                    ║"
-    echo "║                                                                               ║"
-    echo "║ ⚠️  PREREQUISITES (from Step 2/3):                                           ║"
-    echo "║     • SSH public key must be added to GitHub repository as deploy key       ║"
-    echo "║     • SSH key should be generated and configured from previous step         ║"
-    echo "║                                                                               ║"
-    echo "║ 📍 LOG FILE: ~/git-ssh-setup.log                                            ║"
-    echo "║                                                                               ║"
-    echo "╚═══════════════════════════════════════════════════════════════════════════════╝"
+    echo "╔═══════════════════════════════════════════════════╗"
+    echo "║        🚀 TERMUX-INIT-GIT: STEP 3/3 - GIT CLONE  ║"
+    echo "║          Repository Clone & SSH Service Setup     ║"
+    echo "╠═══════════════════════════════════════════════════╣"
+    echo "║ 📋 SUMMARY OF WHAT WILL BE DONE:                 ║"
+    echo "║                                                   ║"
+    echo "║ 🔐 1. SSH Connection Verification                ║"
+    echo "║     • Verify GitHub SSH access via port 443      ║"
+    echo "║     • Start SSH agent and load keys              ║"
+    echo "║     • Test authentication with GitHub            ║"
+    echo "║                                                   ║"
+    echo "║ 📦 2. Repository Cloning                         ║"
+    echo "║     • Clone: android-research/termux-namp        ║"
+    echo "║     • Setup repo contents in home directory      ║"
+    echo "║                                                   ║"
+    echo "║ 🔧 3. SSH Configuration                          ║"
+    echo "║     • Configure ~/.ssh directory & permissions   ║"
+    echo "║     • Add GitHub to known_hosts                   ║"
+    echo "║     • Setup authorized_keys from repository      ║"
+    echo "║                                                   ║"
+    echo "║ 🚀 4. SSH Service Setup                          ║"
+    echo "║     • Install SSH service daemon                 ║"
+    echo "║     • Start SSH service for remote access        ║"
+    echo "║                                                   ║"
+    echo "║ ⚠️  PREREQUISITES (from Step 2/3):               ║"
+    echo "║     • SSH public key must be added to GitHub     ║"
+    echo "║     • SSH key generated from previous step       ║"
+    echo "║                                                   ║"
+    echo "║ 📍 LOG FILE: ~/git-ssh-setup.log                ║"
+    echo "╚═══════════════════════════════════════════════════╝"
     echo ""
 }
 
@@ -68,14 +66,15 @@ confirm_setup() {
     echo "🔗 Add your SSH key as a deploy key at:"
     echo "   https://github.com/android-research/termux-namp/settings/keys"
     echo ""
-    read -p "Do you want to proceed with the repository clone and SSH service setup? (y/n): " -n 1 -r
+    read -p "Do you want to proceed with the repository clone and SSH service setup? (y/n): " -r
     echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z "$REPLY" ]]; then
+        echo "✅ Proceeding with git clone and SSH service setup..."
+        echo ""
+    else
         echo "❌ Setup cancelled by user."
         exit 0
     fi
-    echo "✅ Proceeding with git clone and SSH service setup..."
-    echo ""
 }
 
 # ==========================================
