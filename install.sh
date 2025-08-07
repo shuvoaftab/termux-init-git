@@ -39,6 +39,111 @@ error() {
     echo -e "${RED}❌ $1${NC}" | tee -a "$LOG_FILE"
 }
 
+# Show summary of what will be done
+show_summary() {
+    echo "🔐 Termux Git Init - Installation Summary"
+    echo "========================================"
+    echo ""
+    info "📝 This script will perform the following actions:"
+    echo ""
+    echo "1. 📦 Install required packages:"
+    echo "   • wget - Download utility"
+    echo "   • curl - HTTP client"
+    echo "   • vim - Text editor"
+    echo "   • busybox - Unix utilities"
+    echo "   • git - Version control system"
+    echo "   • openssh - SSH client/server"
+    echo ""
+    echo "2. 🔍 Check and verify all dependencies are working"
+    echo ""
+    echo "3. 📥 Download termux-init-git repository from:"
+    echo "   $REPO_URL"
+    echo "   to: $INSTALL_DIR"
+    echo ""
+    echo "4. 🔧 Set up proper file permissions for scripts"
+    echo ""
+    echo "5. 📋 Display setup instructions and next steps"
+    echo ""
+    warning "💡 Note: Package installation requires internet connection"
+    warning "📖 Please review the scripts before running them after installation"
+    echo ""
+}
+
+# Confirm installation
+confirm_installation() {
+    echo -n "Do you want to proceed with the installation? (y/N): "
+    
+    # Handle piped input by reading from terminal directly
+    if [ -t 0 ]; then
+        read -n 1 -r REPLY
+    else
+        # When piped (like from curl), read from terminal
+        read -n 1 -r REPLY < /dev/tty
+    fi
+    echo ""
+    
+    case $REPLY in
+        [Yy])
+            success "Installation confirmed. Proceeding..."
+            return 0
+            ;;
+        *)
+            warning "Installation cancelled by user."
+            exit 0
+            ;;
+    esac
+}
+
+# Install essential packages first
+install_essential_packages() {
+    info "Installing essential packages..."
+    
+    # Update package list first
+    info "Updating package list..."
+    if pkg update -y; then
+        success "Package list updated"
+    else
+        warning "Package update failed, continuing anyway..."
+    fi
+    
+    # Install all required packages in one go
+    local packages="wget curl vim busybox git openssh"
+    info "Installing packages: $packages"
+    
+    if pkg install -y $packages; then
+        success "All essential packages installed successfully"
+    else
+        error "Failed to install some packages"
+        info "Attempting individual package installation..."
+        
+        # Try installing packages individually if bulk install fails
+        for pkg_name in $packages; do
+            info "Installing $pkg_name..."
+            if pkg install -y "$pkg_name"; then
+                success "$pkg_name installed"
+            else
+                warning "Failed to install $pkg_name - may already be installed or unavailable"
+            fi
+        done
+    fi
+    
+    # Verify critical packages
+    local critical_missing=()
+    for dep in git curl ssh-keygen; do
+        if ! command -v "$dep" >/dev/null 2>&1; then
+            critical_missing+=("$dep")
+        fi
+    done
+    
+    if [ ${#critical_missing[@]} -gt 0 ]; then
+        error "Critical packages still missing: ${critical_missing[*]}"
+        info "Please install manually and run this script again"
+        exit 1
+    fi
+    
+    success "Essential packages installation completed"
+}
+
 # Check dependencies
 check_dependencies() {
     info "Checking dependencies..."
@@ -223,6 +328,12 @@ main() {
     echo "Installing secure Git setup for Termux..."
     echo ""
     
+    # Show summary of what will be done
+    show_summary
+    
+    # Ask for user confirmation
+    confirm_installation
+    
     # Create log file directory if needed
     local log_dir=$(dirname "$LOG_FILE")
     if [ ! -d "$log_dir" ]; then
@@ -245,6 +356,10 @@ main() {
     info "Current shell: $0"
     info "Working directory: $(pwd)"
     
+    # Install essential packages first
+    install_essential_packages
+    
+    # Then check all dependencies
     check_dependencies
     download_repo
     setup_permissions
@@ -277,10 +392,13 @@ show_help() {
     echo "  --uninstall   Remove installation"
     echo ""
     echo "This script will:"
-    echo "1. Check and install required dependencies"
-    echo "2. Download the termux-init-git repository"
-    echo "3. Set up proper file permissions"
-    echo "4. Show next steps for configuration"
+    echo "1. Show a summary of actions to be performed"
+    echo "2. Ask for user confirmation to proceed"
+    echo "3. Install essential packages (wget, curl, vim, busybox, git, openssh)"
+    echo "4. Check and verify all dependencies are working"
+    echo "5. Download the termux-init-git repository"
+    echo "6. Set up proper file permissions"
+    echo "7. Show next steps for configuration"
     echo ""
     echo "For more information, visit:"
     echo "$REPO_URL"

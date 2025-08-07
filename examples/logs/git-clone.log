@@ -1,0 +1,107 @@
+~ $ ./termux-init-git/git-clone.sh
+🔐 Verifying GitHub SSH access...                       🚀 Starting SSH agent...
+Agent pid 8067                                          🔑 Adding key to SSH agent: /data/data/com.termux/files/home/.ssh/id_ed25519                                    ⚠️ SSH agent not available, skipping key addition
+🔑 Adding key to SSH agent: /data/data/com.termux/files/home/.ssh/id_rsa
+⚠️ SSH agent not available, skipping key addition        🔑 Adding key to SSH agent: /data/data/com.termux/files/home/.ssh/id_rsa_git                                    ⚠️ SSH agent not available, skipping key addition
+🔍 Testing SSH connection to GitHub via port 443...     ✅ SSH auth with GitHub successful.
+⚠️ Repo already exists at /data/data/com.termux/files/home/.git, skipping clone.
+📁 Ensuring ~/.ssh exists...
+🔑 Appending authorized_keys from repo...               🔧 Installing SSH service...
+Installing SSH service...
+Validating SSH environment...
+  ✓ Running in Termux environment
+  ✓ OpenSSH server found
+  ✓ SSH client found
+Creating SSH directories...
+[2025-08-07 14:13:15] Creating SSH directory structure
+  ✓ SSH config directory: /data/data/com.termux/files/home/app/production/ssh
+  ✓ SSH config fragments directory: /data/data/com.termux/files/home/app/production/ssh/sshd_config.d
+  ✓ SSH log directory: /data/data/com.termux/files/home/resources/logs/ssh
+  ✓ SSH host key directory: /data/data/com.termux/files/home/app/production/ssh/keys
+  ✓ User SSH directory: /data/data/com.termux/files/home/.ssh
+  ✓ Authorized keys directory: /data/data/com.termux/files/home/app/production/ssh
+  ✓ SSH backup directory created
+[2025-08-07 14:13:15] SSH directory structure created successfully
+Generating SSH host keys...
+[2025-08-07 14:13:16] Starting SSH host key generation
+  ✓ rsa host key already exists
+[2025-08-07 14:13:16] rsa host key already exists: /data/data/com.termux/files/home/app/production/ssh/keys/ssh_host_rsa_key
+    ✓ Key integrity verified
+  ✓ ed25519 host key already exists
+[2025-08-07 14:13:16] ed25519 host key already exists: /data/data/com.termux/files/home/app/production/ssh/keys/ssh_host_ed25519_key
+    ✓ Key integrity verified
+  ✓ ecdsa host key already exists
+[2025-08-07 14:13:16] ecdsa host key already exists: /data/data/com.termux/files/home/app/production/ssh/keys/ssh_host_ecdsa_key
+    ✓ Key integrity verified
+Creating SSH configuration...
+[2025-08-07 14:13:16] Creating SSH configuration
+  ✓ SSH configuration already exists
+[2025-08-07 14:13:16] SSH configuration already exists: /data/data/com.termux/files/home/app/production/ssh/sshd_config
+Testing SSH configuration...
+  ✓ SSH configuration is valid
+Setting up SSH key authentication...
+[2025-08-07 14:13:16] Setting up SSH key authentication
+  ✓ authorized_keys file exists: /data/data/com.termux/files/home/app/production/ssh/authorized_keys
+  ✓ User authorized_keys file exists: /data/data/com.termux/files/home/.ssh/authorized_keys
+  ✓ User key pair already exists
+
+SSH Key Management:
+1. Add public key: /data/data/com.termux/files/home/scripts/services/ssh-service.sh key-add <public_key_data> <comment>
+2. List keys: /data/data/com.termux/files/home/scripts/services/ssh-service.sh key-list
+3. Remove key: /data/data/com.termux/files/home/scripts/services/ssh-service.sh key-remove <comment>
+
+Remote Connection:
+ssh -p 8022 -i ~/.ssh/id_ed25519 user@<android-device-ip>
+[2025-08-07 14:13:16] SSH key authentication setup completed
+✓ SSH service installation completed
+
+Next steps:
+1. Start SSH service: /data/data/com.termux/files/home/scripts/services/ssh-service.sh start
+2. Check status: /data/data/com.termux/files/home/scripts/services/ssh-service.sh status
+3. View connection info: /data/data/com.termux/files/home/scripts/services/ssh-service.sh info
+🚀 Starting SSH service...
+Starting SSH server...
+Validating SSH environment...
+  ✓ Running in Termux environment
+  ✓ OpenSSH server found
+  ✓ SSH client found
+Creating SSH directories...
+[2025-08-07 14:13:16] Creating SSH directory structure
+  ✓ SSH config directory: /data/data/com.termux/files/home/app/production/ssh
+  ✓ SSH config fragments directory: /data/data/com.termux/files/home/app/production/ssh/sshd_config.d
+  ✓ SSH log directory: /data/data/com.termux/files/home/resources/logs/ssh
+  ✓ SSH host key directory: /data/data/com.termux/files/home/app/production/ssh/keys
+  ✓ User SSH directory: /data/data/com.termux/files/home/.ssh
+  ✓ Authorized keys directory: /data/data/com.termux/files/home/app/production/ssh
+  ✓ SSH backup directory created
+[2025-08-07 14:13:16] SSH directory structure created successfully
+Generating SSH host keys...
+[2025-08-07 14:13:16] Starting SSH host key generation
+  ✓ rsa host key already exists
+[2025-08-07 14:13:16] rsa host key already exists: /data/data/com.termux/files/home/app/production/ssh/keys/ssh_host_rsa_key
+    ✓ Key integrity verified
+  ✓ ed25519 host key already exists
+[2025-08-07 14:13:16] ed25519 host key already exists: /data/data/com.termux/files/home/app/production/ssh/keys/ssh_host_ed25519_key
+    ✓ Key integrity verified
+  ✓ ecdsa host key already exists
+[2025-08-07 14:13:16] ecdsa host key already exists: /data/data/com.termux/files/home/app/production/ssh/keys/ssh_host_ecdsa_key
+    ✓ Key integrity verified
+Creating SSH configuration...
+[2025-08-07 14:13:16] Creating SSH configuration
+  ✓ SSH configuration already exists
+[2025-08-07 14:13:16] SSH configuration already exists: /data/data/com.termux/files/home/app/production/ssh/sshd_config
+Testing SSH configuration...
+  ✓ SSH configuration is valid
+  → Starting sshd daemon...
+/data/data/com.termux/files/home/app/production/ssh/sshd_config line 70: Unsupported option UsePAM
+/data/data/com.termux/files/home/app/production/ssh/sshd_config line 136: Unsupported option PrintLastLog
+/data/data/com.termux/files/home/app/production/ssh/sshd_config line 145: Deprecated option UsePrivilegeSeparation
+/data/data/com.termux/files/home/app/production/ssh/sshd_config.d/security-hardening.conf line 18: Unsupported option UsePAM
+/data/data/com.termux/files/home/app/production/ssh/sshd_config.d/security-hardening.conf line 84: Unsupported option PrintLastLog
+/data/data/com.termux/files/home/app/production/ssh/sshd_config.d/security-hardening.conf line 88: Deprecated option UsePrivilegeSeparation
+  ✓ SSH server started successfully
+  → PID: 8211
+  → Port: 8022
+  → Configuration: /data/data/com.termux/files/home/app/production/ssh/sshd_config
+  → Logs: /data/data/com.termux/files/home/resources/logs/ssh
+  
