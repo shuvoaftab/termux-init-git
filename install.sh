@@ -112,7 +112,7 @@ install_essential_packages() {
     echo ""
     
     # Install packages individually with clear headings
-    local packages=("wget" "curl" "vim" "busybox" "git" "openssh")
+    local packages=("wget" "curl" "vim" "busybox" "git" "openssh" "sudo")
     local pkg_descriptions=(
         "Download utility for fetching files"
         "HTTP client for web requests"
@@ -120,6 +120,7 @@ install_essential_packages() {
         "Unix utilities collection"
         "Version control system"
         "SSH client and server tools"
+        "Superuser do command for privilege escalation"
     )
     
     local total_packages=${#packages[@]}
