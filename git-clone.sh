@@ -68,7 +68,12 @@ confirm_setup() {
     echo ""
     while true; do
         printf "Do you want to proceed with the repository clone and SSH service setup? (Y/n): "
-        read -r REPLY
+        # Use /dev/tty to read directly from terminal when script is piped
+        if [ -t 0 ]; then
+            read -r REPLY
+        else
+            read -r REPLY </dev/tty 2>/dev/null || REPLY=""
+        fi
         echo
         case $REPLY in
             [Yy]* | "" )
@@ -161,7 +166,12 @@ clone_repository() {
         echo ""
         while true; do
             printf "Do you want to re-download the repository? This will remove existing files (y/N): "
-            read -r REPLY
+            # Use /dev/tty to read directly from terminal when script is piped
+            if [ -t 0 ]; then
+                read -r REPLY
+            else
+                read -r REPLY </dev/tty 2>/dev/null || REPLY=""
+            fi
             echo
             case $REPLY in
                 [Yy]* )
@@ -299,20 +309,37 @@ setup_ssh_service() {
         bash "$SSH_SERVICE_SCRIPT" install | tee -a "$LOG"
 
         log "🚀 Starting SSH service..."
-        SSH_OUTPUT=$(bash "$SSH_SERVICE_SCRIPT" start 2>&1)
-        echo "$SSH_OUTPUT" | tee -a "$LOG"
-        
-        # Give the service a moment to start
-        sleep 2
-        
-        # Check if SSH service started successfully
-        if echo "$SSH_OUTPUT" | grep -q "SSH server started successfully"; then
-            log "✅ SSH service setup complete."
-            echo ""
-            echo "$SSH_OUTPUT" | grep -E "(✓|→)" || true
+        # Use timeout to prevent hanging and capture output properly
+        if timeout 30s bash "$SSH_SERVICE_SCRIPT" start > /tmp/ssh_start_output.txt 2>&1; then
+            SSH_OUTPUT=$(cat /tmp/ssh_start_output.txt)
+            echo "$SSH_OUTPUT" | tee -a "$LOG"
+            
+            # Give the service a moment to start
+            sleep 2
+            
+            # Check if SSH service started successfully
+            if echo "$SSH_OUTPUT" | grep -q "SSH server started successfully"; then
+                log "✅ SSH service setup complete."
+                echo ""
+                echo "$SSH_OUTPUT" | grep -E "(✓|→)" || true
+            elif pgrep -f sshd > /dev/null; then
+                log "✅ SSH service appears to be running (detected via process check)"
+                # Try to get status info
+                if [ -f "$SSH_SERVICE_SCRIPT" ]; then
+                    bash "$SSH_SERVICE_SCRIPT" info 2>/dev/null | tee -a "$LOG" || true
+                fi
+            else
+                log "❌ SSH service may not have started correctly"
+                log "⚠️ Check the output above for any errors"
+            fi
+            
+            # Clean up temp file
+            rm -f /tmp/ssh_start_output.txt
         else
-            log "❌ SSH service may not have started correctly"
-            log "⚠️ Check the output above for any errors"
+            log "❌ SSH service start command timed out or failed"
+            log "💡 Try manually: bash $SSH_SERVICE_SCRIPT start"
+            # Clean up temp file
+            rm -f /tmp/ssh_start_output.txt
         fi
     else
         log "❌ SSH service script not found at $SSH_SERVICE_SCRIPT"
@@ -348,7 +375,12 @@ main() {
     
     # Final completion message
     echo "Press Enter to exit..."
-    read -r
+    # Use /dev/tty to read directly from terminal when script is piped
+    if [ -t 0 ]; then
+        read -r
+    else
+        read -r </dev/tty 2>/dev/null || true
+    fi
     
     # Ensure script exits cleanly
     exit 0
