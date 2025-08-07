@@ -66,15 +66,24 @@ confirm_setup() {
     echo "🔗 Add your SSH key as a deploy key at:"
     echo "   https://github.com/android-research/termux-namp/settings/keys"
     echo ""
-    read -p "Do you want to proceed with the repository clone and SSH service setup? (y/n): " -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z "$REPLY" ]]; then
-        echo "✅ Proceeding with git clone and SSH service setup..."
-        echo ""
-    else
-        echo "❌ Setup cancelled by user."
-        exit 0
-    fi
+    while true; do
+        read -p "Do you want to proceed with the repository clone and SSH service setup? (Y/n): " -r
+        echo
+        case $REPLY in
+            [Yy]* | "" )
+                echo "✅ Proceeding with git clone and SSH service setup..."
+                echo ""
+                break
+                ;;
+            [Nn]* )
+                echo "❌ Setup cancelled by user."
+                exit 0
+                ;;
+            * )
+                echo "Please answer y (yes) or n (no), or press Enter for yes."
+                ;;
+        esac
+    done
 }
 
 # ==========================================
@@ -85,16 +94,16 @@ retry_ssh_check() {
     local attempt=1
     log "🔍 Testing SSH connection to GitHub via port 443..."
     
-    # Use SSH config settings (no need to specify key file)
-    until ssh -T -p 443 git@ssh.github.com 2>&1 | tee -a "$LOG" | grep -E "(successfully authenticated|You've successfully authenticated)" > /dev/null; do
+    # Use verbose SSH connection for debugging
+    until ssh -T -v -p 443 git@ssh.github.com 2>&1 | tee -a "$LOG" | grep -E "(successfully authenticated|You've successfully authenticated)" > /dev/null; do
         if (( attempt >= RETRIES )); then
             log "❌ Failed to authenticate with GitHub after $RETRIES attempts."
             log "💡 Make sure your SSH key is added as a deploy key to the repository."
-            log "💡 You can test manually with: ssh -T -p 443 git@ssh.github.com"
+            log "💡 You can test manually with: ssh -T -v -p 443 git@ssh.github.com"
             
             # Show last SSH attempt for debugging
             log "🔍 Last SSH attempt output:"
-            ssh -T -p 443 git@ssh.github.com 2>&1 | tail -5 | tee -a "$LOG"
+            ssh -T -v -p 443 git@ssh.github.com 2>&1 | tail -10 | tee -a "$LOG"
             exit 1
         fi
         log "⏳ GitHub auth not ready. Retrying ($attempt/$RETRIES)..."
