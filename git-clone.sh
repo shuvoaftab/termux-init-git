@@ -67,7 +67,8 @@ confirm_setup() {
     echo "   https://github.com/android-research/termux-namp/settings/keys"
     echo ""
     while true; do
-        read -p "Do you want to proceed with the repository clone and SSH service setup? (Y/n): " -r
+        printf "Do you want to proceed with the repository clone and SSH service setup? (Y/n): "
+        read -r REPLY
         echo
         case $REPLY in
             [Yy]* | "" )
@@ -156,31 +157,85 @@ clone_repository() {
     echo ""
     
     if [ -d "$DEST/.git" ]; then
-        log "⚠️ Repo already exists at $DEST/.git, skipping clone."
-    else
-        log "📦 Cloning repo contents to $DEST (with trace logging)..."
-        # Create a temporary directory for cloning in a writable location
-        TEMP_CLONE="$HOME/temp-clone-$$"
-        
-        # Clean up any existing temp directory
-        rm -rf "$TEMP_CLONE"
-        
-        GIT_TRACE=1 GIT_SSH_COMMAND="ssh -v -p 443" git clone "$REPO_SSH" "$TEMP_CLONE" 2>&1 | tee -a "$LOG"
+        log "⚠️ Repository already exists at $DEST/.git"
+        echo ""
+        while true; do
+            printf "Do you want to re-download the repository? This will remove existing files (y/N): "
+            read -r REPLY
+            echo
+            case $REPLY in
+                [Yy]* )
+                    log "🗑️ Removing existing repository files..."
+                    
+                    # List of repository files and directories to remove
+                    REPO_ITEMS=(
+                        ".git"
+                        ".gitignore"
+                        ".gitconfig"
+                        ".bash_profile"
+                        ".p10k.zsh"
+                        ".zshrc"
+                        "app"
+                        "docs"
+                        "resources"
+                        "scripts"
+                        "www"
+                        "README.md"
+                        "TODO.md"
+                        "ISSUES.md"
+                        "SETUP.md"
+                    )
+                    
+                    # Remove repository items
+                    for item in "${REPO_ITEMS[@]}"; do
+                        if [[ "$item" == file_list_*.txt ]]; then
+                            # Handle wildcard pattern for file_list files
+                            rm -rf "$DEST"/file_list_*.txt 2>/dev/null || true
+                        else
+                            if [ -e "$DEST/$item" ]; then
+                                log "  • Removing: $item"
+                                rm -rf "$DEST/$item" 2>/dev/null || true
+                            fi
+                        fi
+                    done
+                    
+                    log "✅ Existing repository files removed, proceeding with fresh clone..."
+                    break
+                    ;;
+                [Nn]* | "" )
+                    log "✅ Keeping existing repository, skipping clone."
+                    echo ""
+                    return 0
+                    ;;
+                * )
+                    echo "Please answer y (yes) or n (no), or press Enter for no."
+                    ;;
+            esac
+        done
+    fi
+    
+    log "📦 Cloning repo contents to $DEST (with trace logging)..."
+    # Create a temporary directory for cloning in a writable location
+    TEMP_CLONE="$HOME/temp-clone-$$"
+    
+    # Clean up any existing temp directory
+    rm -rf "$TEMP_CLONE"
+    
+    GIT_TRACE=1 GIT_SSH_COMMAND="ssh -v -p 443" git clone "$REPO_SSH" "$TEMP_CLONE" 2>&1 | tee -a "$LOG"
 
-        if [ $? -eq 0 ] && [ -d "$TEMP_CLONE" ]; then
-            log "📁 Moving repository contents to $DEST..."
-            # Move all contents including .git to HOME
-            cd "$TEMP_CLONE"
-            mv .* * "$DEST/" 2>/dev/null
-            cd "$HOME"
-            rmdir "$TEMP_CLONE" 2>/dev/null
-            log "✅ Repository cloned successfully to $DEST"
-        else
-            log "❌ Clone failed - check network connection and SSH key setup"
-            log "💡 Verify your deploy key is added to: https://github.com/android-research/termux-namp/settings/keys"
-            rm -rf "$TEMP_CLONE"
-            exit 1
-        fi
+    if [ $? -eq 0 ] && [ -d "$TEMP_CLONE" ]; then
+        log "📁 Moving repository contents to $DEST..."
+        # Move all contents including .git to HOME
+        cd "$TEMP_CLONE"
+        mv .* * "$DEST/" 2>/dev/null
+        cd "$HOME"
+        rmdir "$TEMP_CLONE" 2>/dev/null
+        log "✅ Repository cloned successfully to $DEST"
+    else
+        log "❌ Clone failed - check network connection and SSH key setup"
+        log "💡 Verify your deploy key is added to: https://github.com/android-research/termux-namp/settings/keys"
+        rm -rf "$TEMP_CLONE"
+        exit 1
     fi
     log "✅ Repository cloning complete."
     echo ""
@@ -222,17 +277,43 @@ setup_ssh_service() {
     echo "╚═══════════════════════════════════════════════════╝"
     echo ""
     
+    # Check if SSH server is already running
+    if pgrep -f sshd > /dev/null; then
+        log "⚠️ SSH server is already running"
+        log "🛑 Stopping existing SSH server..."
+        pkill -f sshd 2>/dev/null || true
+        sleep 2
+        
+        # Verify it's stopped
+        if pgrep -f sshd > /dev/null; then
+            log "❌ Could not stop existing SSH server"
+            log "💡 You may need to manually stop it: pkill -f sshd"
+            return 1
+        else
+            log "✅ Existing SSH server stopped successfully"
+        fi
+    fi
+    
     if [ -f "$SSH_SERVICE_SCRIPT" ]; then
         log "🔧 Installing SSH service..."
         bash "$SSH_SERVICE_SCRIPT" install | tee -a "$LOG"
 
         log "🚀 Starting SSH service..."
-        bash "$SSH_SERVICE_SCRIPT" start | tee -a "$LOG"
+        SSH_OUTPUT=$(bash "$SSH_SERVICE_SCRIPT" start 2>&1)
+        echo "$SSH_OUTPUT" | tee -a "$LOG"
         
         # Give the service a moment to start
         sleep 2
         
-        log "✅ SSH service setup complete."
+        # Check if SSH service started successfully
+        if echo "$SSH_OUTPUT" | grep -q "SSH server started successfully"; then
+            log "✅ SSH service setup complete."
+            echo ""
+            echo "$SSH_OUTPUT" | grep -E "(✓|→)" || true
+        else
+            log "❌ SSH service may not have started correctly"
+            log "⚠️ Check the output above for any errors"
+        fi
     else
         log "❌ SSH service script not found at $SSH_SERVICE_SCRIPT"
         log "⚠️ SSH service setup skipped - script not available"
@@ -264,6 +345,10 @@ main() {
     echo "🎉 All steps completed successfully!"
     echo "📍 View the full log at: $LOG"
     echo ""
+    
+    # Final completion message
+    echo "Press Enter to exit..."
+    read -r
     
     # Ensure script exits cleanly
     exit 0
